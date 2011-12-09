@@ -2,22 +2,7 @@
 /**
  * Enables the use LESS in WordPress
  *
- * Usage:
- *
- * Extract the zip into your theme or plugin directory.
- *
- * For use with themes add the following lines to functions.php:
- *
- * 		require_once( 'wp-less/wp-less.php' );
- * 		wp_enqueue_style( 'style', 'http://url/to/style.less' );
- *
- * Any registered styles with the .less suffix will be compiled
- *
- * All the standard LESS features are supported as well as @import rules
- * anywhere within the file.
- *
- * Read the LESS.js documentation here: http://lesscss.org/
- * For documenation specific to the PHP parser: http://leafo.net/lessphp/docs/
+ * See README.md for usage information
  */
 
 
