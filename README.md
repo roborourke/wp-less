@@ -6,9 +6,11 @@ Extract the zip into your theme or plugin directory.
 
 For use with themes add the following lines to your functions.php:
 
-    require_once( 'wp-less/wp-less.php' );
-    if ( ! is_admin() )
-        wp_enqueue_style( 'style', get_stylesheet_directory_uri() . '/style.less' );
+```php
+require_once( 'wp-less/wp-less.php' );
+if ( ! is_admin() )
+    wp_enqueue_style( 'style', get_stylesheet_directory_uri() . '/style.less' );
+```
 
 Any registered styles with the .less suffix will be compiled and the file URL rewritten.
 
