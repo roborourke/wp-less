@@ -1,6 +1,6 @@
 <?php
 /**
- * Enables the use LESS in WordPress
+ * Enables the use of LESS in WordPress
  *
  * See README.md for usage information
  */
@@ -22,13 +22,16 @@ if ( ! class_exists( 'wp_less' ) ) {
 			// every CSS file URL gets passed through this filter
 			add_filter( 'style_loader_src', array( &$this, 'parse_stylesheet' ), 100000, 2 );
 
-			// editor stylesheets are concatenated and run through this filter - passing them through the parser won't hurt
+			// editor stylesheet URLs are concatenated and run through this filter
 			add_filter( 'mce_css', array( &$this, 'parse_editor_stylesheets' ), 100000 );
 
 		}
 
 		/**
 		 * Lessify the stylesheet and return the href of the compiled file
+		 *
+		 * @param String $src	Source URL of the file to be parsed
+		 * @param String $handle	An identifier for the file used to create the file name in the cache
 		 *
 		 * @return String    URL of the compiled stylesheet
 		 */
@@ -87,7 +90,7 @@ if ( ! class_exists( 'wp_less' ) ) {
 		/**
 		 * Get a nice handle to use for the compiled CSS file name
 		 *
-		 * @param String $url
+		 * @param String $url 	File URL to generate a handle from
 		 *
 		 * @return String    Sanitised string to use for handle
 		 */
@@ -104,6 +107,10 @@ if ( ! class_exists( 'wp_less' ) ) {
 
 		/**
 		 * Get (and create if unavailable) the compiled CSS cache directory
+		 *
+		 * @param Bool $path 	If true this method returns the cache's system path. Set to false to return the cache URL
+		 *
+		 * @return String 	The system path or URL of the cache folder
 		 */
 		function get_cache_dir( $path = true ) {
 
@@ -120,7 +127,7 @@ if ( ! class_exists( 'wp_less' ) ) {
 			}
 
 			return $dir;
-		
+
 		}
 
 	}
