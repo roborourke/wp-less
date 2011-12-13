@@ -22,6 +22,9 @@ if ( ! class_exists( 'wp_less' ) ) {
 			// every CSS file URL gets passed through this filter
 			add_filter( 'style_loader_src', array( &$this, 'parse_stylesheet' ), 100000, 2 );
 
+			// editor stylesheets are concatenated and run through this filter - passing them through the parser won't hurt
+			add_filter( 'mce_css', array( &$this, 'parse_editor_stylesheets' ), 100000 );
+
 		}
 
 		/**
@@ -55,6 +58,51 @@ if ( ! class_exists( 'wp_less' ) ) {
 		}
 
 		/**
+		 * Compile editor stylesheets registered via add_editor_style()
+		 *
+		 * @param String $mce_css comma separated list of CSS file URLs
+		 *
+		 * @return String    New comma separated list of CSS file URLs
+		 */
+		function parse_editor_stylesheets( $mce_css ) {
+
+			// extract CSS file URLs
+			$style_sheets = explode( ',', $mce_css );
+
+			if ( count( $style_sheets ) ) {
+				$compiled_css = array();
+
+				// loop through editor styles, any .less files will be compiled and the compiled URL returned
+				foreach( $style_sheets as $style_sheet )
+					$compiled_css[] = $this->parse_stylesheet( $style_sheet, $this->url_to_handle( "$style_sheet" ) );
+
+				$mce_css = implode( ',', $compiled_css );
+			}
+
+			// return new URLs
+			return $mce_css;
+
+		}
+
+		/**
+		 * Get a nice handle to use for the compiled CSS file name
+		 *
+		 * @param String $url
+		 *
+		 * @return String    Sanitised string to use for handle
+		 */
+		function url_to_handle( $url ) {
+
+			$url = preg_replace( "/^.*?\/wp-content\/themes\//", '', $url );
+			$url = str_replace( '.less', '', $url );
+			$url = str_replace( '/', '-', $url );
+
+			return sanitize_key( $url );
+
+		}
+
+
+		/**
 		 * Get (and create if unavailable) the compiled CSS cache directory
 		 */
 		function get_cache_dir( $path = true ) {
@@ -72,6 +120,7 @@ if ( ! class_exists( 'wp_less' ) ) {
 			}
 
 			return $dir;
+		
 		}
 
 	}
