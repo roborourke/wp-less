@@ -43,14 +43,30 @@ if ( ! class_exists( 'wp_less' ) ) {
 
 			// get file path from $src
 			preg_match( "/^(.*?\/wp-content\/)([^\?]+)(.*)$/", $src, $src_bits );
-			$src_path = WP_CONTENT_DIR . '/' . $src_bits[ 2 ];
+			$less_path = WP_CONTENT_DIR . '/' . $src_bits[ 2 ];
 
-			// cache file name
-			$cache_path = $this->get_cache_dir() . "/$handle.css";
+			// output css file name
+			$css_path = $this->get_cache_dir() . "/$handle.css";
 
-			// ccompile automatically regenerates files if source's modified time has changed
+			// vars to pass into the compiler - default @themeurl var for image urls etc...
+			$vars = apply_filters( 'less_vars', array( 'themeurl' => '~"' . get_stylesheet_directory_uri() . '"' ), $handle );
+			$vars = apply_filters( "less_vars_$handle", $vars );
+
+			// automatically regenerate files if source's modified time has changed or vars have changed
 			try {
-				lessc::ccompile( $src_path, $cache_path );
+				// load the cache
+				$cache_path = "$css_path.cache";
+				if ( file_exists( $cache_path ) )
+					$full_cache = unserialize( file_get_contents( $cache_path ) );
+				else
+					$full_cache = array( 'vars' => $vars, 'less' => $less_path );
+
+				$less_cache = lessc::cexecute( $full_cache[ 'less' ] );
+				if ( ! is_array( $less_cache ) || $less_cache['updated'] > $full_cache[ 'less' ]['updated'] || $vars !== $full_cache[ 'vars' ] ) {
+					$less = new lessc( $less_path );
+					file_put_contents( $cache_path, serialize( array( 'vars' => $vars, 'less' => $less_cache ) ) );
+					file_put_contents( $css_path, $less->parse( null, $vars ) );
+				}
 			} catch ( exception $ex ) {
 				wp_die( $ex->getMessage() );
 			}
