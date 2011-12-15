@@ -9,9 +9,18 @@ have WordPress do the job of compiling and caching the resulting CSS. It
 eliminates the extra step of having to compile the .less files into CSS yourself
 before deploying them.
 
-## Usage:
+## Installation:
 
-Extract the zip into your theme or plugin directory.
+If you are using git to clone the repository do the following:
+
+    git clone git://github.com/sanchothefat/wp-less.git wp-less
+    git submodule update --init
+
+If you are downloading the zip or tar don't forget to download the lessphp
+dependency too https://github.com/leafo/lessphp and copy it into the `lessc`
+folder.
+
+## Usage:
 
 For use with themes add the following lines to your functions.php:
 
