@@ -3,6 +3,8 @@
  * Enables the use of LESS in WordPress
  *
  * See README.md for usage information
+ *
+ * Licensed under WTFPL
  */
 
 
@@ -144,6 +146,18 @@ if ( ! class_exists( 'wp_less' ) ) {
 
 			return $dir;
 
+		}
+
+
+		/**
+		 * Escape a string that has non alpha numeric characters variable for use within .less stylesheets
+		 *
+		 * @param string $str The string to escape
+		 *
+		 * @return string    String ready for passing into the compiler
+		 */
+		function sanitize_string( $str ) {
+			return '~"' . $str . '"';
 		}
 
 	}

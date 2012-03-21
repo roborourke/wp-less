@@ -96,5 +96,10 @@ break.
 
 ## Further Reading
 
-Read the LESS.js documentation here: http://lesscss.org/
+[Read the LESS.js documentation here]: http://lesscss.org/
+
 For documenation specific to the PHP parser: http://leafo.net/lessphp/docs/
+
+## License
+
+The software is licensed under [WTFPL]: http://sam.zoy.org/wtfpl/
