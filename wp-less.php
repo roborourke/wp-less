@@ -44,7 +44,6 @@ if ( ! class_exists( 'wp_less' ) ) {
 				return $src;
 
 			// get file path from $src
-			$rel_theme_path = basename( WP_CONTENT_DIR ) . '/themes';
 			$less_path_parts = explode( '?', str_replace( get_bloginfo( 'template_url' ), get_template_directory(), $src ) );
 			
 			$less_path = reset( $less_path_parts );
