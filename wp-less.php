@@ -44,9 +44,12 @@ if ( ! class_exists( 'wp_less' ) ) {
 				return $src;
 
 			// get file path from $src
-			preg_match( "/^(.*?\/wp-content\/)([^\?]+)(.*)$/", $src, $src_bits );
-			$less_path = WP_CONTENT_DIR . '/' . $src_bits[ 2 ];
-
+			$rel_theme_path = basename( WP_CONTENT_DIR ) . '/themes';
+			$less_path_parts = explode( '?', str_replace( get_bloginfo( 'template_url' ), get_template_directory(), $src ) );
+			
+			$less_path = reset( $less_path_parts );
+			$query_string = end( $less_path_parts );
+			
 			// output css file name
 			$css_path = $this->get_cache_dir() . "/$handle.css";
 
@@ -74,7 +77,7 @@ if ( ! class_exists( 'wp_less' ) ) {
 			}
 
 			// return the compiled stylesheet with the query string it had if any
-			return $this->get_cache_dir( false ) . "/$handle.css" . ( isset( $src_bits[ 3 ] ) ? $src_bits[ 3 ] : '' );
+			return $this->get_cache_dir( false ) . "/$handle.css" . ( ! empty( $query_string ) ? '?' . $query_string : '' );
 
 		}
 
