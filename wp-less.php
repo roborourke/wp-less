@@ -44,10 +44,7 @@ if ( ! class_exists( 'wp_less' ) ) {
 				return $src;
 
 			// get file path from $src
-			$less_path_parts = explode( '?', str_replace( get_bloginfo( 'template_url' ), get_template_directory(), $src ) );
-			
-			$less_path = reset( $less_path_parts );
-			$query_string = end( $less_path_parts );
+			list( $less_path, $query_string ) = explode( '?', str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $src ) );
 			
 			// output css file name
 			$css_path = $this->get_cache_dir() . "/$handle.css";
