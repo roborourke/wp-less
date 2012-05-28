@@ -1,5 +1,16 @@
 <?php
 /**
+Plugin Name: LESS CSS Auto Compiler
+Plugin URI: https://github.com/sanchothefat/wp-less/
+Description: Allows you to enqueue .less files and have them automatically compiled whenever a change is detected.
+Author: Robert O'Rourke
+Version: 1.0
+Author URI: http://interconnectit.com
+License: WTFPL
+*/
+
+
+/**
  * Enables the use of LESS in WordPress
  *
  * See README.md for usage information
@@ -45,7 +56,7 @@ if ( ! class_exists( 'wp_less' ) ) {
 
 			// get file path from $src
 			preg_match( "/^(.*?\/wp-content\/)([^\?]+)(.*)$/", $src, $src_bits );
-			$less_path = WP_CONTENT_DIR . '/' . $src_bits[ 2 ];
+			$less_path = WP_Filesystem_Base::wp_content_dir() . '/' . $src_bits[ 2 ];
 
 			// output css file name
 			$css_path = $this->get_cache_dir() . "/$handle.css";
