@@ -55,6 +55,8 @@ if ( ! class_exists( 'wp_less' ) ) {
 				return $src;
 
 			// get file path from $src
+			if ( ! strstr( $src, '?' ) )
+				$src .= '?';
 			list( $less_path, $query_string ) = explode( '?', str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $src ) );
 
 			// output css file name
@@ -124,8 +126,8 @@ if ( ! class_exists( 'wp_less' ) ) {
 		 */
 		function url_to_handle( $url ) {
 
-			list( $url, $query_string ) = explode( '?', str_replace( WP_CONTENT_URL, '', $url ) );
-			$url = str_replace( '.less', '', $url );
+			$url = parse_url( $url );
+			$url = str_replace( '.less', '', basename( $url[ 'path' ] ) );
 			$url = str_replace( '/', '-', $url );
 
 			return sanitize_key( $url );
@@ -146,12 +148,12 @@ if ( ! class_exists( 'wp_less' ) ) {
 			$upload_dir = wp_upload_dir();
 
 			if ( $path ) {
-				$dir = str_replace( $upload_dir[ 'subdir' ], '', $upload_dir[ 'path' ] ) . '/wp-less-cache';
+				$dir = trailingslashit( $upload_dir[ 'basedir' ] ) . 'wp-less-cache';
 				// create folder if it doesn't exist yet
 				if ( ! file_exists( $dir ) )
 					wp_mkdir_p( $dir );
 			} else {
-				$dir = str_replace( $upload_dir[ 'subdir' ], '', $upload_dir[ 'url' ] ) . '/wp-less-cache';
+				$dir = trailingslashit( $upload_dir[ 'baseurl' ] ) . 'wp-less-cache';
 			}
 
 			return $dir;

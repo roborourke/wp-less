@@ -9,6 +9,8 @@ have WordPress do the job of compiling and caching the resulting CSS. It
 eliminates the extra step of having to compile the .less files into CSS yourself
 before deploying them.
 
+Thanks to @franz-josef-kaiser and @willmot for their contributions.
+
 ## Installation:
 
 If you are using git to clone the repository do the following:
@@ -60,7 +62,7 @@ You can now pass variables into your .less files using one of two hooks:
 add_filter( 'less_vars', 'my_less_vars', 10, 2 );
 function my_less_vars( $vars, $handle ) {
     // $handle is a reference to the handle used with wp_enqueue_style()
-    $vars[ 'color' ] => '#000000';
+    $vars[ 'color' ] = '#000000';
     return $vars;
 }
 
@@ -68,7 +70,7 @@ function my_less_vars( $vars, $handle ) {
 // in this case 'style' is the handle we enqueued the .less file with
 add_filter( 'less_vars_style', 'style_less_vars' );
 function style_less_vars( $vars ) {
-    $vars[ 'color' ] => '#ffffff';
+    $vars[ 'color' ] = '#ffffff';
     return $vars;
 }
 
