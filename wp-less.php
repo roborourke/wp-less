@@ -75,8 +75,14 @@ class wp_less {
 			return $src;
 
 		// get file path from $src
-		preg_match( "/^(.*?\/wp-content\/)([^\?]+)(.*)$/", $src, $src_bits );
-		$less_path = trailingslashit( WP_CONTENT_DIR ) . $src_bits[ 2 ];
+		if ( ! preg_match( "/\.less(\.php)?$/", preg_replace( "/\?.*$/", "", $src ) ) )
+			return $src;
+
+		// get file path from $src
+		if ( ! strstr( $src, '?' ) )
+			$src .= '?';
+
+		list( $less_path, $query_string ) = explode( '?', str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $src ) );
 
 		// output css file name
 		$css_path = trailingslashit( $this->get_cache_dir() ) . "{$handle}.css";
