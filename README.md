@@ -9,8 +9,6 @@ have WordPress do the job of compiling and caching the resulting CSS. It
 eliminates the extra step of having to compile the .less files into CSS yourself
 before deploying them.
 
-Thanks to @franz-josef-kaiser and @willmot for their contributions.
-
 ## Installation:
 
 If you are using git to clone the repository do the following:
@@ -101,6 +99,14 @@ break.
 [Read the LESS.js documentation here](http://lesscss.org/)
 
 For documenation specific to the PHP parser: http://leafo.net/lessphp/docs/
+
+
+## Contributors
+
+Big massive thanks to those whose contributions and discussion has helped to improve the plugin.
+
+* [Tom Willmot][https://github.com/willmot]
+* [Franz Josef Kaiser][https://github.com/franz-josef-kaiser]
 
 ## License
 
