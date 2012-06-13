@@ -51,8 +51,7 @@ if ( ! class_exists( 'wp_less' ) ) {
 		function parse_stylesheet( $src, $handle ) {
 
 			// we only want to handle .less files
-			$pathinfo = pathinfo( $src );
-			if ( ! in_array( $pathinfo[ 'extension' ], array( 'php', 'less' ) ) && ! strstr( $src, '.less' ) )
+			if ( ! preg_match( "/\.less(\.php)?$/", preg_replace( "/\?.*$/", "", $src ) ) )
 				return $src;
 
 			// get file path from $src
@@ -69,19 +68,19 @@ if ( ! class_exists( 'wp_less' ) ) {
 
 			// automatically regenerate files if source's modified time has changed or vars have changed
 			try {
-			
+
 				// load the cache
 				$cache_path = "$css_path.cache";
-				
+
 				if ( file_exists( $cache_path ) )
 					$full_cache = unserialize( file_get_contents( $cache_path ) );
-				
+
 				// If the root path in the cache is wrong then regenerate
 				if ( ! isset( $full_cache['less']['root'] ) || ! file_exists( $full_cache['less']['root'] ) )
 					$full_cache = array( 'vars' => $vars, 'less' => $less_path );
-					
+
 				$less_cache = lessc::cexecute( $full_cache[ 'less' ] );
-				
+
 				if ( ! is_array( $less_cache ) || $less_cache['updated'] > $full_cache[ 'less' ]['updated'] || $vars !== $full_cache[ 'vars' ] ) {
 					$less = new lessc( $less_path );
 					file_put_contents( $cache_path, serialize( array( 'vars' => $vars, 'less' => $less_cache ) ) );
