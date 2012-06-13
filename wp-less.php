@@ -51,7 +51,8 @@ if ( ! class_exists( 'wp_less' ) ) {
 		function parse_stylesheet( $src, $handle ) {
 
 			// we only want to handle .less files
-			if ( ! strstr( $src, '.less' ) )
+			$pathinfo = pathinfo( $src );
+			if ( ! in_array( $pathinfo[ 'extension' ], array( 'php', 'less' ) ) && ! strstr( $src, '.less' ) )
 				return $src;
 
 			// get file path from $src
