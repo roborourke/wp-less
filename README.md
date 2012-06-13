@@ -22,12 +22,14 @@ folder.
 
 ## Usage:
 
+You can either install the script as a standard plugin or use it as an include within a theme or plugin.
+
 For use with themes add the following lines to your functions.php:
 
 ```php
 <?php
 
-// Include the class
+// Include the class (unless you are using the script as a plugin)
 require_once( 'wp-less/wp-less.php' );
 
 // enqueue a .less style sheet
