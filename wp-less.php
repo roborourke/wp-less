@@ -52,7 +52,6 @@ if ( ! class_exists( 'wp_less' ) ) {
 
 			// vars to pass into the compiler - default @themeurl var for image urls etc...
 			$vars = apply_filters( 'less_vars', array( 'themeurl' => '~"' . get_stylesheet_directory_uri() . '"' ), $handle );
-			$vars = apply_filters( "less_vars_$handle", $vars );
 
 			// automatically regenerate files if source's modified time has changed or vars have changed
 			try {
