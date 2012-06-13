@@ -173,13 +173,13 @@ class wp_less {
 
 		if ( $path ) {
 			$dir = str_replace( $upload_dir['subdir'], '', $upload_dir['path'] );
-			$dir = trailingslashit( $dir ) . 'wp-less-cache';
+			$dir = apply_filters( 'wp_less_cache_path', trailingslashit( $dir ) . 'wp-less-cache' );
 			// create folder if it doesn't exist yet
 			if ( ! file_exists( $dir ) )
 				wp_mkdir_p( $dir );
 		} else {
 			$dir = str_replace( $upload_dir['subdir'], '', $upload_dir['url'] );
-			$dir = trailingslashit( $dir ) . 'wp-less-cache';
+			$dir = apply_filters( 'wp_less_cache_url', trailingslashit( $dir ) . 'wp-less-cache' );
 		}
 
 		return $dir;
