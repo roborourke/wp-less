@@ -148,15 +148,15 @@ if ( ! class_exists( 'wp_less' ) ) {
 			$upload_dir = wp_upload_dir();
 
 			if ( $path ) {
-				$dir = trailingslashit( $upload_dir[ 'basedir' ] ) . 'wp-less-cache';
+				$dir = apply_filters( 'wp_less_cache_path', trailingslashit( $upload_dir[ 'basedir' ] ) . 'wp-less-cache' );
 				// create folder if it doesn't exist yet
 				if ( ! file_exists( $dir ) )
 					wp_mkdir_p( $dir );
 			} else {
-				$dir = trailingslashit( $upload_dir[ 'baseurl' ] ) . 'wp-less-cache';
+				$dir = apply_filters( 'wp_less_cache_url', trailingslashit( $upload_dir[ 'baseurl' ] ) . 'wp-less-cache' );
 			}
 
-			return $dir;
+			return rtrim( $dir, '/' );
 
 		}
 

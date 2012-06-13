@@ -1,4 +1,4 @@
-# Enables LESS in WordPress
+# Enable LESS CSS in WordPress
 
 LESS is an abstraction layer that adds some very powerful features to CSS. It
 will speed up your development process and make your life that much easier. Find
