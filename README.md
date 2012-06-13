@@ -105,8 +105,8 @@ For documenation specific to the PHP parser: http://leafo.net/lessphp/docs/
 
 Big massive thanks to those whose contributions and discussion has helped to improve the plugin.
 
-* [Tom Willmot][https://github.com/willmot]
-* [Franz Josef Kaiser][https://github.com/franz-josef-kaiser]
+* [Tom Willmot](https://github.com/willmot)
+* [Franz Josef Kaiser](https://github.com/franz-josef-kaiser)
 
 ## License
 
