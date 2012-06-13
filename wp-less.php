@@ -22,10 +22,10 @@ if ( ! class_exists( 'wp_less' ) ) {
 		function __construct() {
 
 			// every CSS file URL gets passed through this filter
-			add_filter( 'style_loader_src', array( &$this, 'parse_stylesheet' ), 100000, 2 );
+			add_filter( 'style_loader_src', array( $this, 'parse_stylesheet' ), 100000, 2 );
 
 			// editor stylesheet URLs are concatenated and run through this filter
-			add_filter( 'mce_css', array( &$this, 'parse_editor_stylesheets' ), 100000 );
+			add_filter( 'mce_css', array( $this, 'parse_editor_stylesheets' ), 100000 );
 
 		}
 
