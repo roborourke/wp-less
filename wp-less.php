@@ -1,7 +1,17 @@
 <?php
+/**
+Plugin Name: LESS CSS Auto Compiler
+Plugin URI: https://github.com/sanchothefat/wp-less/
+Description: Allows you to enqueue .less files and have them automatically compiled whenever a change is detected.
+Author: Robert O'Rourke
+Contributors: Franz-Josef Kaiser, Tom Willmot
+Version: 1.1
+Author URI: http://interconnectit.com
+License: MIT
+*/
+
 // Busted! No direct file access
 ! defined( 'ABSPATH' ) AND exit;
-
 
 
 // load LESS parser
@@ -9,17 +19,17 @@
 
 
 if ( ! class_exists( 'wp_less' ) ) {
-	// INIT @after_setup_theme hook
-	add_action( 'after_setup_theme', array( 'wp_less', 'instance' ) );
+	// add on init to support theme customiser in v3.4
+	add_action( 'init', array( 'wp_less', 'instance' ) );
 
 /**
  * Enables the use of LESS in WordPress
- * 
+ *
  * See README.md for usage information
- * 
+ *
  * @author  Robert "sancho the fat" O'Rourke @link http://sanchothefat.com/
  * @package WP LESS
- * @license WTFPL
+ * @license MIT
  * @version 2012-06-13.1701
  */
 class wp_less {
@@ -47,7 +57,7 @@ class wp_less {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @return void
 	 */
 	public function __construct() {
@@ -71,16 +81,11 @@ class wp_less {
 	public function parse_stylesheet( $src, $handle ) {
 
 		// we only want to handle .less files
-		if ( ! strstr( $src, '.less' ) )
-			return $src;
-
-		// get file path from $src
 		if ( ! preg_match( "/\.less(\.php)?$/", preg_replace( "/\?.*$/", "", $src ) ) )
 			return $src;
 
 		// get file path from $src
-		if ( ! strstr( $src, '?' ) )
-			$src .= '?';
+		if ( ! strstr( $src, '?' ) ) $src .= '?'; // prevent non-existent index warning when using list() & explode()
 
 		list( $less_path, $query_string ) = explode( '?', str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $src ) );
 
@@ -94,14 +99,15 @@ class wp_less {
 		try {
 			// load the cache
 			$cache_path = "{$css_path}.cache";
-			if ( file_exists( $cache_path ) ) {
+			if ( file_exists( $cache_path ) )
 				$full_cache = unserialize( file_get_contents( $cache_path ) );
-			} else {
-				$full_cache = array( 'vars' => $vars, 'less' => $less_path );
-			}
 
-			$less_cache = lessc :: cexecute( $full_cache['less'] );
-			if ( ! is_array( $less_cache ) || $less_cache['updated'] > $full_cache['less']['updated'] || $vars !== $full_cache['vars'] ) {
+			// If the root path in the cache is wrong then regenerate
+			if ( ! isset( $full_cache[ 'less' ][ 'root' ] ) || ! file_exists( $full_cache[ 'less' ][ 'root' ] ) )
+				$full_cache = array( 'vars' => $vars, 'less' => $less_path );
+
+			$less_cache = lessc :: cexecute( $full_cache[ 'less' ] );
+			if ( ! is_array( $less_cache ) || $less_cache[ 'updated' ] > $full_cache[ 'less' ][ 'updated' ] || $vars !== $full_cache[ 'vars' ] ) {
 				$less = new lessc( $less_path );
 				file_put_contents( $cache_path, serialize( array( 'vars' => $vars, 'less' => $less_cache ) ) );
 				file_put_contents( $css_path, $less->parse( null, $vars ) );
@@ -111,7 +117,7 @@ class wp_less {
 		}
 
 		// return the compiled stylesheet with the query string it had if any
-		return trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css" . ( isset( $src_bits[ 3 ] ) ? $src_bits[ 3 ] : '' );
+		return trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css" . ( ! empty( $query_string ) ? "?{$query_string}" : '' );
 	}
 
 
@@ -132,7 +138,7 @@ class wp_less {
 
 			// loop through editor styles, any .less files will be compiled and the compiled URL returned
 			foreach( $style_sheets as $style_sheet )
-				$compiled_css[] = $this->parse_stylesheet( $style_sheet, $this->url_to_handle( "$style_sheet" ) );
+				$compiled_css[] = $this->parse_stylesheet( $style_sheet, $this->url_to_handle( $style_sheet ) );
 
 			$mce_css = implode( ",", $compiled_css );
 		}
@@ -151,8 +157,8 @@ class wp_less {
 	 */
 	public function url_to_handle( $url ) {
 
-		$url = preg_replace( "/^.*?\/wp-content\/themes\//", '', $url );
-		$url = str_replace( '.less', '', $url );
+		$url = parse_url( $url );
+		$url = str_replace( '.less', '', basename( $url[ 'path' ] ) );
 		$url = str_replace( '/', '-', $url );
 
 		return sanitize_key( $url );
@@ -172,17 +178,15 @@ class wp_less {
 		$upload_dir = wp_upload_dir();
 
 		if ( $path ) {
-			$dir = str_replace( $upload_dir['subdir'], '', $upload_dir['path'] );
-			$dir = apply_filters( 'wp_less_cache_path', trailingslashit( $dir ) . 'wp-less-cache' );
+			$dir = apply_filters( 'wp_less_cache_path', trailingslashit( $upload_dir[ 'basedir' ] ) . 'wp-less-cache' );
 			// create folder if it doesn't exist yet
 			if ( ! file_exists( $dir ) )
 				wp_mkdir_p( $dir );
 		} else {
-			$dir = str_replace( $upload_dir['subdir'], '', $upload_dir['url'] );
-			$dir = apply_filters( 'wp_less_cache_url', trailingslashit( $dir ) . 'wp-less-cache' );
+			$dir = apply_filters( 'wp_less_cache_url', trailingslashit( $upload_dir[ 'baseurl' ] ) . 'wp-less-cache' );
 		}
 
-		return $dir;
+		return rtrim( $dir, '/' );
 	}
 
 
