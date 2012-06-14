@@ -66,14 +66,6 @@ function my_less_vars( $vars, $handle ) {
     return $vars;
 }
 
-// pass variables into a specific .less file
-// in this case 'style' is the handle we enqueued the .less file with
-add_filter( 'less_vars_style', 'style_less_vars' );
-function style_less_vars( $vars ) {
-    $vars[ 'color' ] = '#ffffff';
-    return $vars;
-}
-
 ?>
 ```
 
