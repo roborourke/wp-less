@@ -6,7 +6,7 @@ Description: Allows you to enqueue .less files and have them automatically compi
 Author: Robert O'Rourke
 Version: 1.0
 Author URI: http://interconnectit.com
-License: WTFPL
+License: MIT
 */
 
 
