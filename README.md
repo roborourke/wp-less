@@ -112,4 +112,4 @@ Big massive thanks to those whose contributions and discussion has helped to imp
 
 ## License
 
-The software is licensed under [WTFPL](http://sam.zoy.org/wtfpl/)
+The software is licensed under the [MIT Licence](http://www.opensource.org/licenses/mit-license.php)
