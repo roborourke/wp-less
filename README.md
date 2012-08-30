@@ -13,8 +13,7 @@ before deploying them.
 
 If you are using git to clone the repository do the following:
 
-    git clone git://github.com/sanchothefat/wp-less.git wp-less
-    git submodule update --init
+    git clone --recursive git://github.com/sanchothefat/wp-less.git wp-less
 
 If you are downloading the zip or tar don't forget to download the lessphp
 dependency too https://github.com/leafo/lessphp and copy it into the `lessc`
