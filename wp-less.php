@@ -67,6 +67,32 @@ class wp_less {
 
 		// editor stylesheet URLs are concatenated and run through this filter
 		add_filter( 'mce_css', array( $this, 'parse_editor_stylesheets' ), 100000 );
+
+		// exclude from official repo update check
+		add_filter( 'http_request_args', array( $this, 'http_request_args' ), 5, 2 );
+	}
+
+	/**
+	 * Exclude from official repo update check.
+	 *
+	 * @link http://markjaquith.wordpress.com/2009/12/14/excluding-your-plugin-or-theme-from-update-checks/
+	 *
+	 * @param array  $r
+	 * @param string $url
+	 *
+	 * @return array
+	 */
+	public function http_request_args( $r, $url ) {
+
+		if ( 0 !== strpos( $url, 'http://api.wordpress.org/plugins/update-check' ) )
+			return $r; // Not a plugin update request. Bail immediately.
+
+		$plugins = unserialize( $r['body']['plugins'] );
+		unset( $plugins->plugins[plugin_basename( __FILE__ )] );
+		unset( $plugins->active[array_search( plugin_basename( __FILE__ ), $plugins->active )] );
+		$r['body']['plugins'] = serialize( $plugins );
+
+		return $r;
 	}
 
 
