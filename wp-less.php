@@ -143,7 +143,8 @@ class wp_less {
 		}
 
 		// return the compiled stylesheet with the query string it had if any
-		return trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css" . ( ! empty( $query_string ) ? "?{$query_string}" : '' );
+		$url = trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css" . ( ! empty( $query_string ) ? "?{$query_string}" : '' );
+		return add_query_arg( 'ver', $less_cache[ 'updated' ], $url );
 	}
 
 
