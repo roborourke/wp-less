@@ -1,11 +1,11 @@
 <?php
 /**
-Plugin Name: LESS CSS Auto Compiler
+Plugin Name: LESS CSS
 Plugin URI: https://github.com/sanchothefat/wp-less/
 Description: Allows you to enqueue .less files and have them automatically compiled whenever a change is detected.
 Author: Robert O'Rourke
-Contributors: Franz-Josef Kaiser, Tom Willmot
-Version: 1.1
+Contributors: Franz-Josef Kaiser, Tom Willmot, Rarst
+Version: 1.2
 Author URI: http://interconnectit.com
 License: MIT
 */
@@ -49,10 +49,40 @@ class wp_less {
 	 * @return void
 	 */
 	public static function instance() {
-
 		null === self :: $instance AND self :: $instance = new self;
 		return self :: $instance;
 	}
+
+
+	/**
+	 * @var mixed Array store of callable functions used to extend the parser
+	 */
+	public static $registered_functions = array();
+	public static $unregistered_functions = array();
+
+
+	/**
+	 * @var array Variables to be passed into the compiler
+	 */
+	public $vars = array();
+
+
+	/**
+	 * @var string Compression class to use
+	 */
+	public $compression = 'compressed';
+
+
+	/**
+	 * @var bool Whether to preserve comments when compiling
+	 */
+	public $preserve_comments = false;
+
+
+	/**
+	 * @var array Default import directory paths for lessc to scan
+	 */
+	public $import_dirs = array();
 
 
 	/**
@@ -118,26 +148,56 @@ class wp_less {
 		// output css file name
 		$css_path = trailingslashit( $this->get_cache_dir() ) . "{$handle}.css";
 
-		// vars to pass into the compiler - default @themeurl var for image urls etc...
-		$vars = apply_filters( 'less_vars', array( 'themeurl' => '~"' . get_stylesheet_directory_uri() . '"' ), $handle );
 
 		// automatically regenerate files if source's modified time has changed or vars have changed
 		try {
+
+			// initialise the parser
+			$less = new lessc;
+
 			// load the cache
 			$cache_path = "{$css_path}.cache";
+
 			if ( file_exists( $cache_path ) )
-				$full_cache = unserialize( file_get_contents( $cache_path ) );
+				$cache = unserialize( file_get_contents( $cache_path ) );
+
+			// vars to pass into the compiler - default @themeurl var for image urls etc...
+			$this->vars[ 'themeurl' ] = '~"' . get_stylesheet_directory_uri() . '"';
+			$this->vars = apply_filters( 'less_vars', $this->vars, $handle );
 
 			// If the root path in the cache is wrong then regenerate
-			if ( ! isset( $full_cache[ 'less' ][ 'root' ] ) || ! file_exists( $full_cache[ 'less' ][ 'root' ] ) )
-				$full_cache = array( 'vars' => $vars, 'less' => $less_path );
+			if ( ( isset( $cache ) && ! isset( $cache[ 'less' ][ 'root' ] ) ) || ! file_exists( $cache[ 'less' ][ 'root' ] ) )
+				$cache = array( 'vars' => $this->vars, 'less' => $less_path );
 
-			$less_cache = lessc :: cexecute( $full_cache[ 'less' ] );
-			if ( ! is_array( $less_cache ) || $less_cache[ 'updated' ] > $full_cache[ 'less' ][ 'updated' ] || $vars !== $full_cache[ 'vars' ] ) {
-				$less = new lessc( $less_path );
-				file_put_contents( $cache_path, serialize( array( 'vars' => $vars, 'less' => $less_cache ) ) );
-				file_put_contents( $css_path, $less->parse( null, $vars ) );
+			// less config
+			$less->setFormatter( apply_filters( 'less_compression', $this->compression ) );
+			$less->setPreserveComments( apply_filters( 'less_preserve_comments', $this->preserve_comments ) );
+			$less->setVariables( $this->vars );
+
+			// add directories to scan for imports
+			$import_dirs = apply_filters( 'less_import_dirs', $this->import_dirs );
+			if ( ! empty( $import_dirs ) ) {
+				foreach( (array)$import_dirs as $dir )
+					$less->addImportDir( $dir );
 			}
+
+			// register and unregister functions
+			foreach( $this->registered_functions as $name => $callable )
+				$less->registerFunction( $name, $callable );
+
+			foreach( $this->unregistered_functions as $name )
+				$less->unregisterFunction( $name );
+
+			// allow devs to mess around with the less object configuration
+			do_action( 'lessc', &$less );
+
+			$less_cache = $less->cachedCompile( $cache[ 'less' ] );
+
+			if ( ! is_array( $cache ) || $less_cache[ 'updated' ] > $cache[ 'updated' ] || $this->vars !== $cache[ 'vars' ] ) {
+				file_put_contents( $cache_path, serialize( array( 'vars' => $this->vars, 'less' => $less_cache ) ) );
+				file_put_contents( $css_path, $less_cache[ 'compiled' ] );
+			}
+
 		} catch ( exception $ex ) {
 			wp_die( $ex->getMessage() );
 		}
@@ -228,6 +288,102 @@ class wp_less {
 
 		return '~"' . $str . '"';
 	}
+
+
+	/**
+	 * Adds an interface to register lessc functions. See the documentation
+	 * for details: http://leafo.net/lessphp/docs/#custom_functions
+	 *
+	 * @param string $name     The name for function used in the less file eg. 'makebluer'
+	 * @param function $callable Callable method or function that returns a lessc variable
+	 *
+	 * @return void
+	 */
+	public function register( $name, $callable ) {
+		$this->registered_functions[ $name ] = $callable;
+	}
+
+	public function unregister( $name ) {
+		$this->unregistered_functions[ $name ] = $name;
+	}
+
+
+	/**
+	 * Function to add or remove less vars prior to compiling
+	 *
+	 * @param string $name  The variable name
+	 * @param string $value The value for the variable as a string
+	 *
+	 * @return void
+	 */
+	public function add_var( $name, $value ) {
+		$this->vars[ $name ] = $value;
+	}
+
+	public function remove_var( $name ) {
+		if ( isset( $this->vars[ $name ] ) )
+			unset( $this->vars[ $name ] );
+	}
+
 } // END class
+
+if ( ! function_exists( 'register_less_function' ) && ! function_exists( 'unregister_less_function' ) ) {
+
+	/**
+	 * Register additional functions you can use in your less stylesheets. You have access
+	 * to the full WordPress API here so there's lots you could do.
+	 *
+	 * @param string $name     The name of the function
+	 * @param function $callable A callable method or function recognisable by call_user_func
+	 *
+	 * @return void
+	 */
+	function register_less_function( $name, $callable ) {
+		$less = wp_less::instance();
+		$less->register( $name, $callable );
+	}
+
+	/**
+	 * Remove any registered lessc functions
+	 *
+	 * @param string $name The function name to remove
+	 *
+	 * @return void
+	 */
+	function unregister_less_function( $name ) {
+		$less = wp_less::instance();
+		$less->unregister( $name );
+	}
+
+}
+
+if ( ! function_exists( 'add_less_var' ) && ! function_exists( 'remove_less_var' ) ) {
+
+	/**
+	 * A simple method of adding less vars via a function call
+	 *
+	 * @param string $name     	The name of the function
+	 * @param string $value 	A string that will converted to the appropriate variable type
+	 *
+	 * @return void
+	 */
+	function add_less_var( $name, $callable ) {
+		$less = wp_less::instance();
+		$less->add_var( $name, $value );
+	}
+
+	/**
+	 * Remove less vars by array key
+	 *
+	 * @param string $name The array key of the variable to remove
+	 *
+	 * @return void
+	 */
+	function remove_less_var( $name ) {
+		$less = wp_less::instance();
+		$less->remove_var( $name );
+	}
+
+}
 
 } // endif;
