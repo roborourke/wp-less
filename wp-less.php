@@ -376,7 +376,7 @@ if ( ! function_exists( 'add_less_var' ) && ! function_exists( 'remove_less_var'
 	 *
 	 * @return void
 	 */
-	function add_less_var( $name, $callable ) {
+	function add_less_var( $name, $value ) {
 		$less = wp_less::instance();
 		$less->add_var( $name, $value );
 	}
