@@ -55,10 +55,15 @@ class wp_less {
 
 
 	/**
-	 * @var mixed Array store of callable functions used to extend the parser
+	 * @var array Array store of callable functions used to extend the parser
 	 */
-	public static $registered_functions = array();
-	public static $unregistered_functions = array();
+	public $registered_functions = array();
+
+
+	/**
+	 * @var array Array store of function names to be removed from the compiler class
+	 */
+	public $unregistered_functions = array();
 
 
 	/**
@@ -117,10 +122,10 @@ class wp_less {
 		if ( 0 !== strpos( $url, 'http://api.wordpress.org/plugins/update-check' ) )
 			return $r; // Not a plugin update request. Bail immediately.
 
-		$plugins = unserialize( $r['body']['plugins'] );
+		$plugins = unserialize( $r[ 'body' ][ 'plugins' ] );
 		unset( $plugins->plugins[plugin_basename( __FILE__ )] );
-		unset( $plugins->active[array_search( plugin_basename( __FILE__ ), $plugins->active )] );
-		$r['body']['plugins'] = serialize( $plugins );
+		unset( $plugins->active[ array_search( plugin_basename( __FILE__ ), $plugins->active ) ] );
+		$r[ 'body' ][ 'plugins' ] = serialize( $plugins );
 
 		return $r;
 	}
@@ -193,7 +198,7 @@ class wp_less {
 
 			$less_cache = $less->cachedCompile( $cache[ 'less' ] );
 
-			if ( ! is_array( $cache ) || $less_cache[ 'updated' ] > $cache[ 'updated' ] || $this->vars !== $cache[ 'vars' ] ) {
+			if ( ! is_array( $cache ) || $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] || $this->vars !== $cache[ 'vars' ] ) {
 				file_put_contents( $cache_path, serialize( array( 'vars' => $this->vars, 'less' => $less_cache ) ) );
 				file_put_contents( $css_path, $less_cache[ 'compiled' ] );
 			}
@@ -300,7 +305,10 @@ class wp_less {
 	 * @return void
 	 */
 	public function register( $name, $callable ) {
-		$this->registered_functions[ $name ] = $callable;
+		if ( is_string( $name ) && is_callable( $callable ) )
+			$this->registered_functions[ $name ] = $callable;
+		else
+			return new WP_Error( 1355, __( 'String not given for name or the function was not callable.' ), func_get_args() );
 	}
 
 	public function unregister( $name ) {
@@ -317,7 +325,8 @@ class wp_less {
 	 * @return void
 	 */
 	public function add_var( $name, $value ) {
-		$this->vars[ $name ] = $value;
+		if ( is_string( $name ) )
+			$this->vars[ $name ] = $value;
 	}
 
 	public function remove_var( $name ) {
