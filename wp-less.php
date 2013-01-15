@@ -299,25 +299,29 @@ class wp_less {
 	 * Adds an interface to register lessc functions. See the documentation
 	 * for details: http://leafo.net/lessphp/docs/#custom_functions
 	 *
-	 * @param string $name     The name for function used in the less file eg. 'makebluer'
-	 * @param function $callable Callable method or function that returns a lessc variable
+	 * @param string 	$name     	The name for function used in the less file eg. 'makebluer'
+	 * @param callback 	$callable 	Callable method or function that returns a lessc variable
 	 *
 	 * @return void
 	 */
 	public function register( $name, $callable ) {
-		if ( is_string( $name ) && is_callable( $callable ) )
-			$this->registered_functions[ $name ] = $callable;
-		else
-			return new WP_Error( 1355, __( 'String not given for name or the function was not callable.' ), func_get_args() );
+		$this->registered_functions[ $name ] = $callable;
 	}
 
+	/**
+	 * Unregisters a function
+	 *
+	 * @param string $name  The function name to unregister
+	 *
+	 * @return void
+	 */
 	public function unregister( $name ) {
 		$this->unregistered_functions[ $name ] = $name;
 	}
 
 
 	/**
-	 * Function to add or remove less vars prior to compiling
+	 * Add less var prior to compiling
 	 *
 	 * @param string $name  The variable name
 	 * @param string $value The value for the variable as a string
@@ -329,6 +333,13 @@ class wp_less {
 			$this->vars[ $name ] = $value;
 	}
 
+	/**
+	 * Removes a less var
+	 *
+	 * @param string $name  Name of the variable to remove
+	 *
+	 * @return void
+	 */
 	public function remove_var( $name ) {
 		if ( isset( $this->vars[ $name ] ) )
 			unset( $this->vars[ $name ] );
@@ -343,7 +354,7 @@ if ( ! function_exists( 'register_less_function' ) && ! function_exists( 'unregi
 	 * to the full WordPress API here so there's lots you could do.
 	 *
 	 * @param string $name     The name of the function
-	 * @param function $callable A callable method or function recognisable by call_user_func
+	 * @param callback $callable A callable method or function recognisable by call_user_func
 	 *
 	 * @return void
 	 */
