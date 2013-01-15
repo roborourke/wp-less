@@ -27,16 +27,15 @@ if ( ! class_exists( 'wp_less' ) ) {
  *
  * See README.md for usage information
  *
- * @author  Robert "sancho the fat" O'Rourke @link http://sanchothefat.com/
+ * @author  Robert "sancho the fat" O'Rourke
+ * @link http://sanchothefat.com/
  * @package WP LESS
  * @license MIT
  * @version 2012-06-13.1701
  */
 class wp_less {
 	/**
-	 * Reusable object instance.
-	 *
-	 * @type object
+	 * @var wp_less Reusable object instance.
 	 */
 	protected static $instance = null;
 
@@ -46,7 +45,7 @@ class wp_less {
 	 * May be used to access class methods from outside.
 	 *
 	 * @see    __construct()
-	 * @return void
+	 * @return wp_less
 	 */
 	public static function instance() {
 		null === self :: $instance AND self :: $instance = new self;
@@ -92,8 +91,6 @@ class wp_less {
 
 	/**
 	 * Constructor
-	 *
-	 * @return void
 	 */
 	public function __construct() {
 
