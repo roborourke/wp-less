@@ -52,7 +52,8 @@ within the file.
 
 ### Passing in variables from PHP
 
-You can now pass variables into your .less files using one of two hooks:
+You can pass variables into your .less files using the `less_vars` hook or with the
+functions defined in the PHP Interface section:
 
 ```php
 <?php
@@ -101,7 +102,7 @@ break.
 
 ### PHP interface
 
-`register_less_function()` allows you to create additional less compiler functions
+**`register_less_function()`** allows you to create additional less compiler functions
 for use in your stylesheet without having to touch the `lessc` class yourself.
 
 ```php
@@ -111,14 +112,14 @@ register_less_function( 'double', function( $args ) {
 } );
 ```
 
-`unregister_less_function()` works in a similar way but unregisters any compiler
+**`unregister_less_function()`** works in a similar way but unregisters any compiler
 functions passed to it by name.
 
 ```php
 unregister_less_function( 'double' );
 ```
 
-`add_less_var()` makes it easy to create or modify variables passed into the
+**`add_less_var()`** makes it easy to create or modify variables passed into the
 compiler. Both arguments should be a string, lessc will work out the type of
 variable it is.
 
@@ -126,7 +127,7 @@ variable it is.
 add_less_var( 'brandcolour', '#ec6704' );
 ```
 
-`remove_less_var()` is the inverse of `add_less_var()` and only requires the
+**`remove_less_var()`** is the inverse of `add_less_var()` and only requires the
 variable name to remove.
 
 ```php
