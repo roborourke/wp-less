@@ -75,6 +75,8 @@ the stylesheet eg:
 body { color: @color; }
 ```
 
+### Default variables
+
 *There are 2 default variables* you can use without worrying about the above code:
 
 **`@themeurl`** is the URL of the current theme directory:
