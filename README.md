@@ -75,16 +75,26 @@ the stylesheet eg:
 body { color: @color; }
 ```
 
-*There is a default variable* you can use without worrying about the above code
-called `@themeurl`:
+*There are 2 default variables* you can use without worrying about the above code:
+
+**`@themeurl`** is the URL of the current theme directory:
 
 ```css
 body { background-image: url(@{themeurl}/images/background.png); }
 ```
 
-This is important because you can't use relative paths - the compiled CSS is
+**`@lessurl`** is the URL of the enqueued less file (this does not change inside imported files):
+
+```css
+.plugin-title { background-image: url(@{lessurl}/images/icon.png); }
+```
+
+`@lessurl` is useful in those cases where you have .less files inside plugins or
+other non theme folder locations.
+
+It is important to use these because you can't use relative paths - the compiled CSS is
 stored in the uploads folder as it is the only place you can guarantee being
-able to write to in any WordPress installation. As a result relative URLs will
+able to write to in any given WordPress installation. As a result relative URLs will
 break.
 
 ### PHP interface

@@ -5,7 +5,7 @@ Plugin URI: https://github.com/sanchothefat/wp-less/
 Description: Allows you to enqueue .less files and have them automatically compiled whenever a change is detected.
 Author: Robert O'Rourke
 Contributors: Franz-Josef Kaiser, Tom Willmot, Rarst
-Version: 1.2
+Version: 1.3
 Author URI: http://interconnectit.com
 License: MIT
 */
@@ -168,6 +168,7 @@ class wp_less {
 
 			// vars to pass into the compiler - default @themeurl var for image urls etc...
 			$this->vars[ 'themeurl' ] = '~"' . get_stylesheet_directory_uri() . '"';
+			$this->vars[ 'lessurl' ]  = '~"' . dirname( $src ) . '"';
 			$this->vars = apply_filters( 'less_vars', $this->vars, $handle );
 
 			// If the root path in the cache is wrong then regenerate
