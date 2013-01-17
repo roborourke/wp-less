@@ -192,7 +192,7 @@ class wp_less {
 				$less->unregisterFunction( $name );
 
 			// allow devs to mess around with the less object configuration
-			do_action( 'lessc', &$less );
+			do_action( 'lessc', array( &$less ) );
 
 			$less_cache = $less->cachedCompile( $cache[ 'less' ] );
 
