@@ -139,7 +139,7 @@ class wp_less {
 	public function parse_stylesheet( $src, $handle ) {
 
 		// we only want to handle .less files
-		if ( ! preg_match( "/\.less(\.php)?$/", preg_replace( "/\?.*$/", "", $src ) ) )
+		if ( ! preg_match( '/\.less(\.php)?$/', preg_replace( '/\?.*$/', '', $src ) ) )
 			return $src;
 
 		// get file path from $src
@@ -168,8 +168,8 @@ class wp_less {
 			$this->vars[ 'lessurl' ]  = '~"' . dirname( $src ) . '"';
 			$this->vars = apply_filters( 'less_vars', $this->vars, $handle );
 
-			// If the root path in the cache is wrong then regenerate
-			if ( ( isset( $cache ) && ! isset( $cache[ 'less' ][ 'root' ] ) ) || ! file_exists( $cache[ 'less' ][ 'root' ] ) )
+			// If the cache or root path in it are invalid then regenerate
+			if ( empty( $cache ) || empty( $cache['less']['root'] ) || ! file_exists( $cache['less']['root'] ) )
 				$cache = array( 'vars' => $this->vars, 'less' => $less_path );
 
 			// less config
@@ -196,11 +196,10 @@ class wp_less {
 
 			$less_cache = $less->cachedCompile( $cache[ 'less' ] );
 
-			if ( ! is_array( $cache ) || $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] || $this->vars !== $cache[ 'vars' ] ) {
+			if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) || $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] || $this->vars !== $cache[ 'vars' ] ) {
 				file_put_contents( $cache_path, serialize( array( 'vars' => $this->vars, 'less' => $less_cache ) ) );
 				file_put_contents( $css_path, $less_cache[ 'compiled' ] );
 			}
-
 		} catch ( exception $ex ) {
 			wp_die( $ex->getMessage() );
 		}
