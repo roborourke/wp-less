@@ -1,22 +1,5 @@
 <?php
-/**
-Plugin Name: LESS CSS
-Plugin URI: https://github.com/sanchothefat/wp-less/
-Description: Allows you to enqueue .less files and have them automatically compiled whenever a change is detected.
-Author: Robert O'Rourke
-Contributors: Franz-Josef Kaiser, Tom Willmot, Rarst
-Version: 1.3
-Author URI: http://interconnectit.com
-License: MIT
-*/
-
-// Busted! No direct file access
-! defined( 'ABSPATH' ) AND exit;
-
-
-// load LESS parser
-! class_exists( 'lessc' ) AND require_once( 'lessc/lessc.inc.php' );
-
+defined( 'ABSPATH' ) OR exit;
 
 if ( ! class_exists( 'wp_less' ) ) {
 	// add on init to support theme customiser in v3.4
@@ -28,14 +11,15 @@ if ( ! class_exists( 'wp_less' ) ) {
  * See README.md for usage information
  *
  * @author  Robert "sancho the fat" O'Rourke
- * @link http://sanchothefat.com/
+ * @link    http://sanchothefat.com/
  * @package WP LESS
  * @license MIT
- * @version 2012-06-13.1701
+ * @version 2013-01-24.0841
  */
 class wp_less {
 	/**
-	 * @var wp_less Reusable object instance.
+	 * @static
+	 * @var    \wp_less Reusable object instance.
 	 */
 	protected static $instance = null;
 
@@ -45,7 +29,8 @@ class wp_less {
 	 * May be used to access class methods from outside.
 	 *
 	 * @see    __construct()
-	 * @return wp_less
+	 * @static
+	 * @return \wp_less
 	 */
 	public static function instance() {
 		null === self :: $instance AND self :: $instance = new self;
@@ -99,42 +84,15 @@ class wp_less {
 
 		// editor stylesheet URLs are concatenated and run through this filter
 		add_filter( 'mce_css', array( $this, 'parse_editor_stylesheets' ), 100000 );
-
-		// exclude from official repo update check
-		add_filter( 'http_request_args', array( $this, 'http_request_args' ), 5, 2 );
-	}
-
-	/**
-	 * Exclude from official repo update check.
-	 *
-	 * @link http://markjaquith.wordpress.com/2009/12/14/excluding-your-plugin-or-theme-from-update-checks/
-	 *
-	 * @param array  $r
-	 * @param string $url
-	 *
-	 * @return array
-	 */
-	public function http_request_args( $r, $url ) {
-
-		if ( 0 !== strpos( $url, 'http://api.wordpress.org/plugins/update-check' ) )
-			return $r; // Not a plugin update request. Bail immediately.
-
-		$plugins = unserialize( $r[ 'body' ][ 'plugins' ] );
-		unset( $plugins->plugins[plugin_basename( __FILE__ )] );
-		unset( $plugins->active[ array_search( plugin_basename( __FILE__ ), $plugins->active ) ] );
-		$r[ 'body' ][ 'plugins' ] = serialize( $plugins );
-
-		return $r;
 	}
 
 
 	/**
 	 * Lessify the stylesheet and return the href of the compiled file
 	 *
-	 * @param String $src	Source URL of the file to be parsed
-	 * @param String $handle	An identifier for the file used to create the file name in the cache
-	 *
-	 * @return String    URL of the compiled stylesheet
+	 * @param  string $src    Source URL of the file to be parsed
+	 * @param  string $handle An identifier for the file used to create the file name in the cache
+	 * @return string         URL of the compiled stylesheet
 	 */
 	public function parse_stylesheet( $src, $handle ) {
 
@@ -213,9 +171,8 @@ class wp_less {
 	/**
 	 * Compile editor stylesheets registered via add_editor_style()
 	 *
-	 * @param String $mce_css comma separated list of CSS file URLs
-	 *
-	 * @return String    New comma separated list of CSS file URLs
+	 * @param  string $mce_css Comma separated list of CSS file URLs
+	 * @return string $mce_css New comma separated list of CSS file URLs
 	 */
 	public function parse_editor_stylesheets( $mce_css ) {
 
@@ -240,9 +197,8 @@ class wp_less {
 	/**
 	 * Get a nice handle to use for the compiled CSS file name
 	 *
-	 * @param String $url 	File URL to generate a handle from
-	 *
-	 * @return String    Sanitised string to use for handle
+	 * @param  string $url File URL to generate a handle from
+	 * @return string $url Sanitized string to use for handle
 	 */
 	public function url_to_handle( $url ) {
 
@@ -257,9 +213,8 @@ class wp_less {
 	/**
 	 * Get (and create if unavailable) the compiled CSS cache directory
 	 *
-	 * @param Bool $path 	If true this method returns the cache's system path. Set to false to return the cache URL
-	 *
-	 * @return String 	The system path or URL of the cache folder
+	 * @param  bool   $path If true this method returns the cache's system path. Set to false to return the cache URL
+	 * @return string $dir  The system path or URL of the cache folder
 	 */
 	public function get_cache_dir( $path = true ) {
 
@@ -282,9 +237,8 @@ class wp_less {
 	/**
 	 * Escape a string that has non alpha numeric characters variable for use within .less stylesheets
 	 *
-	 * @param string $str The string to escape
-	 *
-	 * @return string    String ready for passing into the compiler
+	 * @param  string $str The string to escape
+	 * @return string $str String ready for passing into the compiler
 	 */
 	public function sanitize_string( $str ) {
 
@@ -296,9 +250,8 @@ class wp_less {
 	 * Adds an interface to register lessc functions. See the documentation
 	 * for details: http://leafo.net/lessphp/docs/#custom_functions
 	 *
-	 * @param string 	$name     	The name for function used in the less file eg. 'makebluer'
-	 * @param callback 	$callable 	Callable method or function that returns a lessc variable
-	 *
+	 * @param  string $name     The name for function used in the less file eg. 'makebluer'
+	 * @param  string $callable (callback) Callable method or function that returns a lessc variable
 	 * @return void
 	 */
 	public function register( $name, $callable ) {
@@ -308,8 +261,7 @@ class wp_less {
 	/**
 	 * Unregisters a function
 	 *
-	 * @param string $name  The function name to unregister
-	 *
+	 * @param  string $name The function name to unregister
 	 * @return void
 	 */
 	public function unregister( $name ) {
@@ -320,9 +272,8 @@ class wp_less {
 	/**
 	 * Add less var prior to compiling
 	 *
-	 * @param string $name  The variable name
-	 * @param string $value The value for the variable as a string
-	 *
+	 * @param  string $name  The variable name
+	 * @param  string $value The value for the variable as a string
 	 * @return void
 	 */
 	public function add_var( $name, $value ) {
@@ -333,74 +284,13 @@ class wp_less {
 	/**
 	 * Removes a less var
 	 *
-	 * @param string $name  Name of the variable to remove
-	 *
+	 * @param  string $name Name of the variable to remove
 	 * @return void
 	 */
 	public function remove_var( $name ) {
 		if ( isset( $this->vars[ $name ] ) )
 			unset( $this->vars[ $name ] );
 	}
-
 } // END class
-
-if ( ! function_exists( 'register_less_function' ) && ! function_exists( 'unregister_less_function' ) ) {
-
-	/**
-	 * Register additional functions you can use in your less stylesheets. You have access
-	 * to the full WordPress API here so there's lots you could do.
-	 *
-	 * @param string $name     The name of the function
-	 * @param callback $callable A callable method or function recognisable by call_user_func
-	 *
-	 * @return void
-	 */
-	function register_less_function( $name, $callable ) {
-		$less = wp_less::instance();
-		$less->register( $name, $callable );
-	}
-
-	/**
-	 * Remove any registered lessc functions
-	 *
-	 * @param string $name The function name to remove
-	 *
-	 * @return void
-	 */
-	function unregister_less_function( $name ) {
-		$less = wp_less::instance();
-		$less->unregister( $name );
-	}
-
-}
-
-if ( ! function_exists( 'add_less_var' ) && ! function_exists( 'remove_less_var' ) ) {
-
-	/**
-	 * A simple method of adding less vars via a function call
-	 *
-	 * @param string $name     	The name of the function
-	 * @param string $value 	A string that will converted to the appropriate variable type
-	 *
-	 * @return void
-	 */
-	function add_less_var( $name, $value ) {
-		$less = wp_less::instance();
-		$less->add_var( $name, $value );
-	}
-
-	/**
-	 * Remove less vars by array key
-	 *
-	 * @param string $name The array key of the variable to remove
-	 *
-	 * @return void
-	 */
-	function remove_less_var( $name ) {
-		$less = wp_less::instance();
-		$less->remove_var( $name );
-	}
-
-}
 
 } // endif;
