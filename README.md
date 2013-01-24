@@ -4,19 +4,19 @@ LESS is an abstraction layer that adds some very powerful features to CSS. It
 will speed up your development process and make your life that much easier. Find
 out more from the links below and then head on back.
 
-The addon I've written allows you to write and edit .less files directly and
+The addon allows you to write and edit `.less` files directly and
 have WordPress do the job of compiling and caching the resulting CSS. It
-eliminates the extra step of having to compile the .less files into CSS yourself
+eliminates the extra step of having to compile the `.less` files into CSS yourself
 before deploying them.
 
 ## Installation:
 
-If you are using git to clone the repository do the following:
+If you are using git to clone the repository, do the following:
 
     git clone --recursive git://github.com/sanchothefat/wp-less.git wp-less
 
-If you are downloading the zip or tar don't forget to download the lessphp
-dependency too https://github.com/leafo/lessphp and copy it into the `lessc`
+If you are downloading the `.zip` or `.tar`, don't forget to download the [lessphp
+dependency too](https://github.com/leafo/lessphp) and copy it into the `lessc`
 folder.
 
 ## Usage:
@@ -41,18 +41,17 @@ add_editor_style( 'editor-style.less' );
 ?>
 ```
 
-Any registered styles with the .less suffix will be compiled and the file URL
-rewritten.
+Any registered styles with the `.less` suffix will be compiled and the file URL rewritten.
 
-You won't need a link to your main style sheet in header.php, just make sure
+You won't need a link to your main style sheet in `header.php`. Just make sure
 that `wp_head()` is called in the document head.
 
-All the standard LESS features are supported as well as @import rules anywhere
+All the standard LESS features are supported as well as `@import` rules anywhere
 within the file.
 
 ### Passing in variables from PHP
 
-You can pass variables into your .less files using the `less_vars` hook or with the
+You can pass variables into your `.less` files using the `less_vars` hook or with the
 functions defined in the PHP Interface section:
 
 ```php
@@ -69,8 +68,8 @@ function my_less_vars( $vars, $handle ) {
 ?>
 ```
 
-Within your .less files you can use the variable as if you had declared it in
-the stylesheet eg:
+Within your `.less` files you can use the variable as if you had declared it in the stylesheet.
+For e.g.:
 
 ```css
 body { color: @color; }
@@ -86,7 +85,7 @@ body { color: @color; }
 body { background-image: url(@{themeurl}/images/background.png); }
 ```
 
-*`@lessurl`** is the URL of the enqueued less file (this does not change inside imported files):
+*`@lessurl`** is the URL of the enqueued LESS file (this does not change inside imported files):
 
 ```css
 .plugin-title { background-image: url(@{lessurl}/images/icon.png); }
@@ -120,7 +119,7 @@ unregister_less_function( 'double' );
 ```
 
 `add_less_var()` makes it easy to create or modify variables passed into the
-compiler. Both arguments should be a string, lessc will work out the type of
+compiler. Both arguments should be a string, as `lessc` will work out the type of
 variable it is.
 
 ```php
@@ -136,9 +135,9 @@ remove_less_var( 'brandcolour' );
 
 ## Further Reading
 
-[Read the LESS.js documentation here](http://lesscss.org/)
+[Read the LESS.js documentation here](http://lesscss.org/).
 
-For documenation specific to the PHP parser: http://leafo.net/lessphp/docs/
+Read the documentation [specific to the PHP parser here](http://leafo.net/lessphp/docs/=.
 
 
 ## Contributors
@@ -151,4 +150,4 @@ Big massive thanks to those whose contributions and discussion has helped to imp
 
 ## License
 
-The software is licensed under the [MIT Licence](http://www.opensource.org/licenses/mit-license.php)
+The software is licensed under the [MIT Licence](http://www.opensource.org/licenses/mit-license.php).
