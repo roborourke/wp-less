@@ -6,7 +6,7 @@ Plugin URI:   https://github.com/sanchothefat/wp-less/
 Description:  Allows you to enqueue <code>.less</code> files and have them automatically compiled whenever a change is detected.
 Author:       Robert O'Rourke
 Contributors: Franz Josef Kaiser, Tom Willmot, Andrey "Rarst" Savchenko
-Version:      3.0.0
+Version:      0.3.0
 Author URI:   http://interconnectit.com
 License:      MIT
  */
