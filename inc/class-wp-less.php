@@ -1,9 +1,4 @@
 <?php
-defined( 'ABSPATH' ) OR exit;
-
-if ( ! class_exists( 'wp_less' ) ) {
-	// add on init to support theme customiser in v3.4
-	add_action( 'init', array( 'wp_less', 'instance' ) );
 
 /**
  * Enables the use of LESS in WordPress
@@ -73,19 +68,47 @@ class wp_less {
 	 */
 	public $import_dirs = array();
 
+	/** @var string path to main plugin file (used as input for some WP API functions) */
+	public $plugin_file;
+
+	/**
+	 * @var array Array of files as 'location' => 'ClassName'
+	 */
+	protected $includes = array(
+		'lessc/lessc.inc'           => 'lessc',
+		'inc/api'                   => '',
+		'inc/class-wp-less-updates' => 'wp_less_updates',
+	);
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
 
+		// not sure about approach with singleton, I tend to use static R.
+		$this->plugin_file = dirname( dirname( __FILE__ ) ) . '/wp-less.php';
+
+		$this->load_files();
+
 		// every CSS file URL gets passed through this filter
 		add_filter( 'style_loader_src', array( $this, 'parse_stylesheet' ), 100000, 2 );
 
 		// editor stylesheet URLs are concatenated and run through this filter
 		add_filter( 'mce_css', array( $this, 'parse_editor_stylesheets' ), 100000 );
+
+		wp_less_updates::init();
 	}
 
+	public function load_files() {
+		foreach ( $this->includes as $file => $class )
+		{
+			if (
+				! empty( $class )
+				AND ! class_exists( $class )
+			)
+				require_once plugin_dir_path( $this->plugin_file )."/{$file}.php";
+		}
+	}
 
 	/**
 	 * Lessify the stylesheet and return the href of the compiled file
@@ -292,5 +315,3 @@ class wp_less {
 			unset( $this->vars[ $name ] );
 	}
 } // END class
-
-} // endif;

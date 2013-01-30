@@ -1,8 +1,5 @@
 <?php
-defined( 'ABSPATH' ) OR exit;
 
-
-add_action( 'plugins_loaded', array( 'wp_less_updates', 'init' ), 8 );
 /**
  * Updates
  * Everything that concerns updates.
@@ -58,8 +55,9 @@ final class wp_less_updates
 			return $r;
 
 		$plugins = unserialize( $r['body']['plugins'] );
-		unset( $plugins->plugins[ plugin_basename( __FILE__ ) ] );
-		unset( $plugins->active[ array_search( plugin_basename( __FILE__ ), $plugins->active ) ] );
+		$wp_less = wp_less::instance();
+		unset( $plugins->plugins[ plugin_basename( $wp_less->plugin_file ) ] );
+		unset( $plugins->active[ array_search( plugin_basename( $wp_less->plugin_file ), $plugins->active ) ] );
 		$r['body']['plugins'] = serialize( $plugins );
 
 		return $r;
