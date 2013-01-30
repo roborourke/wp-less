@@ -36,10 +36,10 @@ final class wp_less_bootstrap
 	 * @var array Array of files as 'location' => 'ClassName'
 	 */
 	private $includes = array(
-		 'lessc/lessc.inc'   => 'lessc'
-		,'inc/wp-less.class' => 'wp_less'
-		,'inc/api'           => ''
-		,'inc/updates.class' => 'wp_less_updates'
+		'lessc/lessc.inc'           => 'lessc',
+		'inc/class-wp-less'         => 'wp_less',
+		'inc/api'                   => '',
+		'inc/class-wp-less-updates' => 'wp_less_updates',
 	);
 
 	/**
