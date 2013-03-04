@@ -194,7 +194,7 @@ class wp_less {
 			// allow devs to mess around with the less object configuration
 			do_action_ref_array( 'lessc', array( &$less ) );
 
-			$less_cache = $less->cachedCompile( $cache[ 'less' ] );
+			$less_cache = $less->cachedCompile( $cache[ 'less' ], apply_filters( 'less_force_compile', false ) );
 
 			if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) || $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] || $this->vars !== $cache[ 'vars' ] ) {
 				file_put_contents( $cache_path, serialize( array( 'vars' => $this->vars, 'less' => $less_cache ) ) );
