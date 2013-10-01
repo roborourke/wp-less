@@ -18,6 +18,6 @@
     "require": {
         "php": ">5.2.4",
         "composer/installers": "~1.0",
-        "leafo/lessphp": "dev-master"
+        "leafo/lessphp": "0.4.0"
     }
 }
