@@ -1,0 +1,23 @@
+{
+    "name": "icit/wp-less",
+    "description": "Provides a LESS compiler compatible with wp_enqueue_style() for rapid CSS development in themes and plugins.",
+    "license": "GPL-2.0+",
+    "type": "wordpress-plugin",
+    "authors": [
+        {
+            "name": "Robert O'Rourke",
+            "email": "rob@interconnectit.com"
+        }
+    ],
+    "authors": [
+        {
+            "name": "Interconnect/IT",
+            "homepage": "http://interconnectit.com/"
+        }
+    ],
+    "require": {
+        "php": ">5.2.4",
+        "composer/installers": "~1.0",
+        "leafo/lessphp": "0.4.0"
+    }
+}

@@ -15,7 +15,7 @@ License:      MIT
 
 
 // load LESS parser
-! class_exists( 'lessc' ) AND require_once( 'lessc/lessc.inc.php' );
+! class_exists( 'lessc' ) AND require_once( 'vendor/leafo/lessphp/lessc.inc.php' );
 
 
 if ( ! class_exists( 'wp_less' ) ) {
