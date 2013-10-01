@@ -1,0 +1,14 @@
+{
+    "name": "icit/wp-less",
+    "description": "Provides a LESS compiler compatible with wp_enqueue_style() for rapid CSS development in themes and plugins.",
+    "license": "GPL 2",
+    "authors": [
+        {
+            "name": "Robert O'Rourke",
+            "email": "rob@interconnectit.com"
+        }
+    ],
+    "require": {
+
+    }
+}
