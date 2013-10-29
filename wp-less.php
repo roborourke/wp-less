@@ -13,10 +13,13 @@ License:      MIT
 // Busted! No direct file access
 ! defined( 'ABSPATH' ) AND exit;
 
-
-// load LESS parser
-! class_exists( 'lessc' ) AND require_once( 'vendor/leafo/lessphp/lessc.inc.php' );
-
+// load the autoloader if it's present 
+if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	require __DIR__ . '/vendor/autoload.php';
+} else if ( file_exists( __DIR__.'/vendor/leafo/lessphp/lessc.inc.php' ) ) {
+	// load LESS parser
+	require_once( __DIR__.'/vendor/leafo/lessphp/lessc.inc.php' );
+}
 
 if ( ! class_exists( 'wp_less' ) ) {
 	// add on init to support theme customiser in v3.4
