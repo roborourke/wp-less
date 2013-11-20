@@ -148,6 +148,13 @@ class wp_less {
 		// get file path from $src
 		if ( ! strstr( $src, '?' ) ) $src .= '?'; // prevent non-existent index warning when using list() & explode()
 
+		// Match the URL schemes between WP_CONTENT_URL and $src, 
+		// so the str_replace further down will work
+		$src_scheme = parse_url( $src, PHP_URL_SCHEME );
+		$wp_content_url_scheme = parse_url( WP_CONTENT_URL, PHP_URL_SCHEME );
+		if ( $src_scheme != $wp_content_url_scheme )
+			$src = set_url_scheme( $src, $wp_content_url_scheme );
+		
 		list( $less_path, $query_string ) = explode( '?', str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $src ) );
 
 		// output css file name
