@@ -154,7 +154,7 @@ remove_less_var( 'brandcolour' );
 
 [Read the LESS.js documentation here](http://lesscss.org/).
 
-Read the documentation [specific to the PHP parser here](http://leafo.net/lessphp/docs/=.
+Read the documentation [specific to the PHP parser here](http://leafo.net/lessphp/docs/).
 
 
 ## Contributors
