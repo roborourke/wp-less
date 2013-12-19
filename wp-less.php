@@ -204,7 +204,14 @@ class wp_less {
 			// allow devs to mess around with the less object configuration
 			do_action_ref_array( 'lessc', array( &$less ) );
 
-			$less_cache = $less->cachedCompile( $cache[ 'less' ], apply_filters( 'less_force_compile', false ) );
+			// $less->cachedCompile only checks for changed file modification times (filemtime)
+			// if using the theme customiser (i.e. change variables) then force a compile
+			if ( $this->vars !== $cache[ 'vars' ] ) { 
+				$force = true; 
+			} else { 
+				$force = false; 
+			}
+			$less_cache = $less->cachedCompile( $cache[ 'less' ], apply_filters( 'less_force_compile', $force ) );
 
 			if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) || $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] || $this->vars !== $cache[ 'vars' ] ) {
 				file_put_contents( $cache_path, serialize( array( 'vars' => $this->vars, 'less' => $less_cache ) ) );
