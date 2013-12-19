@@ -204,8 +204,8 @@ class wp_less {
 			// allow devs to mess around with the less object configuration
 			do_action_ref_array( 'lessc', array( &$less ) );
 
-			// $less->cachedCompile only checks for changed file modification times (filemtime)
-			// if using the theme customiser (i.e. change variables) then force a compile
+			// $less->cachedCompile only checks for changed file modification times
+			// if using the theme customiser (changed variables not files) then force a compile
 			if ( $this->vars !== $cache[ 'vars' ] ) { 
 				$force = true; 
 			} else { 
