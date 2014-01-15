@@ -13,7 +13,7 @@ License:      MIT
 // Busted! No direct file access
 ! defined( 'ABSPATH' ) AND exit;
 
-// load the autoloader if it's present 
+// load the autoloader if it's present
 if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require __DIR__ . '/vendor/autoload.php';
 } else if ( file_exists( __DIR__.'/vendor/leafo/lessphp/lessc.inc.php' ) ) {
@@ -148,18 +148,17 @@ class wp_less {
 		// get file path from $src
 		if ( ! strstr( $src, '?' ) ) $src .= '?'; // prevent non-existent index warning when using list() & explode()
 
-		// Match the URL schemes between WP_CONTENT_URL and $src, 
+		// Match the URL schemes between WP_CONTENT_URL and $src,
 		// so the str_replace further down will work
 		$src_scheme = parse_url( $src, PHP_URL_SCHEME );
 		$wp_content_url_scheme = parse_url( WP_CONTENT_URL, PHP_URL_SCHEME );
 		if ( $src_scheme != $wp_content_url_scheme )
 			$src = set_url_scheme( $src, $wp_content_url_scheme );
-		
+
 		list( $less_path, $query_string ) = explode( '?', str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $src ) );
 
 		// output css file name
 		$css_path = trailingslashit( $this->get_cache_dir() ) . "{$handle}.css";
-
 
 		// automatically regenerate files if source's modified time has changed or vars have changed
 		try {
@@ -206,10 +205,10 @@ class wp_less {
 
 			// $less->cachedCompile only checks for changed file modification times
 			// if using the theme customiser (changed variables not files) then force a compile
-			if ( $this->vars !== $cache[ 'vars' ] ) { 
-				$force = true; 
-			} else { 
-				$force = false; 
+			if ( $this->vars !== $cache[ 'vars' ] ) {
+				$force = true;
+			} else {
+				$force = false;
 			}
 			$less_cache = $less->cachedCompile( $cache[ 'less' ], apply_filters( 'less_force_compile', $force ) );
 
@@ -221,8 +220,12 @@ class wp_less {
 			wp_die( $ex->getMessage() );
 		}
 
-		// return the compiled stylesheet with the query string it had if any
+		// restore query string it had if any
 		$url = trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css" . ( ! empty( $query_string ) ? "?{$query_string}" : '' );
+
+		// restore original url scheme
+		$url = set_url_scheme( $url, $src_scheme );
+
 		return add_query_arg( 'ver', $less_cache[ 'updated' ], $url );
 	}
 
