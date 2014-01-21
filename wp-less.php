@@ -120,6 +120,11 @@ class wp_less {
 		if ( 0 !== strpos( $url, 'http://api.wordpress.org/plugins/update-check' ) )
 			return $r; // Not a plugin update request. Bail immediately.
 
+		if ( $r['response']['code'] != 200 ) {
+			// this is a failed request! We cant modify the results if the results timed out/failed
+			return $r;
+		}
+
 		$plugins = unserialize( $r[ 'body' ][ 'plugins' ] );
 		unset( $plugins->plugins[plugin_basename( __FILE__ )] );
 		unset( $plugins->active[ array_search( plugin_basename( __FILE__ ), $plugins->active ) ] );
