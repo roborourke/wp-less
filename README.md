@@ -16,8 +16,8 @@ If you are using git to clone the repository, do the following:
     git clone git://github.com/sanchothefat/wp-less.git wp-less
 
 If you are downloading the `.zip` or `.tar`, don't forget to download the [lessphp
-dependency too](https://github.com/leafo/lessphp) and copy it into the `lessc`
-folder.
+dependency too](https://github.com/leafo/lessphp) and copy it into the `vendor/leafo/lessphp`
+directory.
 
 Then install the lessphp dependency using:
 
@@ -154,7 +154,7 @@ remove_less_var( 'brandcolour' );
 
 [Read the LESS.js documentation here](http://lesscss.org/).
 
-Read the documentation [specific to the PHP parser here](http://leafo.net/lessphp/docs/=.
+Read the documentation [specific to the PHP parser here](http://leafo.net/lessphp/docs/).
 
 
 ## Contributors
