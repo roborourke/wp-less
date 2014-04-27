@@ -22,12 +22,12 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 }
 
 require_once( 'wp-less.class.php');
-
-if ( ! class_exists( 'wp_less' ) ) {
-	// add on init to support theme customiser in v3.4
-	add_action( 'init', array( 'wp_less', 'instance' ) );
+require_once( 'wp-less-admin.class.php' );
 
 
+$admin_page = new wp_less_admin();
+// add on init to support theme customiser in v3.4
+add_action( 'init', array( 'wp_less', 'instance' ) );
 
 if ( ! function_exists( 'register_less_function' ) && ! function_exists( 'unregister_less_function' ) ) {
 	/**
@@ -80,4 +80,3 @@ if ( ! function_exists( 'add_less_var' ) && ! function_exists( 'remove_less_var'
 	}
 }
 
-} // endif;
