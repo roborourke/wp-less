@@ -28,15 +28,20 @@ class wp_less_admin {
 	}
 
 	public function add_pages() {
-		add_management_page( 'WP Less', 'WP Less', 'manage_options', 'wpless', array( $this, 'display' ) );
+		add_management_page( 'WP LESS', 'WP LESS', 'manage_options', 'wpless', array( $this, 'display' ) );
 	}
 
 	public function display() {
-		echo 'wp less';
 		?>
 		<div class="wrap about-wrap">
 			<h2>WP-Less</h2>
 
+			<?php
+			$recent_messages = get_option('wpless-recent-messages');
+			foreach ( $recent_messages as $message ) {
+				echo '<p>'.$message.'</p>';
+			}
+			?>
 		</div>
 	<?php
 	}
