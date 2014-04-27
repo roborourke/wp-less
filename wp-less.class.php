@@ -198,10 +198,23 @@ if ( !class_exists( 'wp_less' ) ) {
 				$less_cache = $less->cachedCompile( $cache[ 'less' ], $force );
 
 				if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) || $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] || $this->vars !== $cache[ 'vars' ] ) {
+					$message = '<strong>[ '.date('D, d M Y H:i:s').' ] Rebuilt stylesheet with handle: "'.$handle.'"</strong><br>';
+					if ( $this->vars !== $cache[ 'vars' ] ) {
+						$message .= '<em>Variables changed</em>';
+					} else if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) ) {
+						$message .= '<em>Empty cache or empty last update time</em>';
+					} else if ( $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] ) {
+						$message .= '<em>Update times different</em>';
+					} else {
+						$message .= '<em><strong>Unknown! Contact the developers poste haste!!!!!!!</em><strong></em>';
+					}
+					$message .= '<br>src: "'.$src.'" css path: "'.$css_path.'" and cache path: "'.$cache_path.'"';
+					$this->add_message( $message );
 					file_put_contents( $cache_path, serialize( array( 'vars' => $this->vars, 'less' => $less_cache ) ) );
 					file_put_contents( $css_path, $less_cache[ 'compiled' ] );
 				}
 			} catch ( exception $ex ) {
+				$this->add_message( '<strong>Lessphp failure</strong> '.$ex->GetMessage() );
 				wp_die( $ex->getMessage() );
 			}
 
@@ -287,7 +300,6 @@ if ( !class_exists( 'wp_less' ) ) {
 		 * @return string $str String ready for passing into the compiler
 		 */
 		public function sanitize_string( $str ) {
-
 			return '~"' . $str . '"';
 		}
 
@@ -336,6 +348,17 @@ if ( !class_exists( 'wp_less' ) ) {
 		public function remove_var( $name ) {
 			if ( isset( $this->vars[ $name ] ) )
 				unset( $this->vars[ $name ] );
+		}
+
+		public function add_message( $message_string ) {
+			$messages = get_option('wpless-recent-messages');
+			if ( !is_array( $messages ) ) {
+				$messages = array();
+			}
+
+			$messages = array_slice( $messages, 0, 19 );
+			array_unshift( $messages, $message_string );
+			update_option( 'wpless-recent-messages', $messages );
 		}
 	}
 }
