@@ -15,7 +15,7 @@ class wp_less_admin {
 	 *
 	 * @see    __construct()
 	 * @static
-	 * @return \wp_less
+	 * @return \wp_less_admin
 	 */
 	public static function instance() {
 		null === self :: $instance AND self :: $instance = new self;
@@ -33,15 +33,34 @@ class wp_less_admin {
 
 	public function display() {
 		?>
-		<div class="wrap about-wrap">
-			<h2>WP-Less</h2>
+		<div class="wrap">
+			<h2>WP-LESS</h2>
 
-			<?php
-			$recent_messages = get_option('wpless-recent-messages');
-			foreach ( $recent_messages as $message ) {
-				echo '<p>'.$message.'</p>';
-			}
-			?>
+			<table>
+				<thead>
+					<th>Time</th>
+					<th>Message</th>
+				</thead>
+				<tbody>
+				<?php
+				$recent_messages = get_option('wpless-recent-messages');
+				if ( !empty( $recent_messages ) ) {
+					foreach ( $recent_messages as $message ) {
+						echo '<tr>';
+						if ( is_array( $message ) ) {
+							echo '<td>'.date( 'D, d M Y H:i:s', $message['time'] ).'</td>';
+							echo '<td>'.$message['payload'].'</td>';
+						} else {
+							echo '<td colspan="2">'.$message.'</td>';
+						}
+						echo '</tr>';
+					}
+				} else {
+					echo '<tr><td colspan="2">No messages</td></tr>';
+				}
+				?>
+				</tbody>
+			</table>
 		</div>
 	<?php
 	}

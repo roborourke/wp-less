@@ -198,23 +198,29 @@ if ( !class_exists( 'wp_less' ) ) {
 				$less_cache = $less->cachedCompile( $cache[ 'less' ], $force );
 
 				if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) || $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] || $this->vars !== $cache[ 'vars' ] ) {
-					$message = '<strong>[ '.date('D, d M Y H:i:s').' ] Rebuilt stylesheet with handle: "'.$handle.'"</strong><br>';
+					$payload = '<strong>Rebuilt stylesheet with handle: "'.$handle.'"</strong><br>';
 					if ( $this->vars !== $cache[ 'vars' ] ) {
-						$message .= '<em>Variables changed</em>';
+						$payload .= '<em>Variables changed</em>';
 					} else if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) ) {
-						$message .= '<em>Empty cache or empty last update time</em>';
+						$payload .= '<em>Empty cache or empty last update time</em>';
 					} else if ( $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] ) {
-						$message .= '<em>Update times different</em>';
+						$payload .= '<em>Update times different</em>';
 					} else {
-						$message .= '<em><strong>Unknown! Contact the developers poste haste!!!!!!!</em><strong></em>';
+						$payload .= '<em><strong>Unknown! Contact the developers poste haste!!!!!!!</em><strong></em>';
 					}
-					$message .= '<br>src: "'.$src.'" css path: "'.$css_path.'" and cache path: "'.$cache_path.'"';
-					$this->add_message( $message );
+					$payload .= '<br>src: <code>"'.$src.'"</code> css path: <code>"'.$css_path.'"</code> and cache path: <code>"'.$cache_path.'"</code>';
+					$this->add_message( array(
+						'time' => time(),
+						'payload' => $payload
+					) );
 					file_put_contents( $cache_path, serialize( array( 'vars' => $this->vars, 'less' => $less_cache ) ) );
 					file_put_contents( $css_path, $less_cache[ 'compiled' ] );
 				}
 			} catch ( exception $ex ) {
-				$this->add_message( '<strong>Lessphp failure</strong> '.$ex->GetMessage() );
+				$this->add_message( array(
+					'time' => time(),
+					'payload' => '<strong>Lessphp failure</strong> '.$ex->GetMessage()
+				) );
 				wp_die( $ex->getMessage() );
 			}
 
