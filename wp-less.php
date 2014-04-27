@@ -4,7 +4,7 @@ Plugin Name:  LESS CSS
 Plugin URI:   https://github.com/sanchothefat/wp-less/
 Description:  Allows you to enqueue <code>.less</code> files and have them automatically compiled whenever a change is detected.
 Author:       Robert O'Rourke
-Contributors: Franz Josef Kaiser, Tom Willmot, Rarst
+Contributors: Franz Josef Kaiser,Tom Willmot, Rarst, Tom J Nowell, Code For The PeopleGIT S
 Version:      2.1
 Author URI:   http://interconnectit.com
 License:      MIT
