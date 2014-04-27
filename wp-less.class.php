@@ -126,7 +126,8 @@ class wp_less {
 			return $src;
 
 		// get file path from $src
-		if ( ! strstr( $src, '?' ) ) $src .= '?'; // prevent non-existent index warning when using list() & explode()
+		if ( ! strstr( $src, '?' ) )
+			$src .= '?'; // prevent non-existent index warning when using list() & explode()
 
 		// Match the URL schemes between WP_CONTENT_URL and $src,
 		// so the str_replace further down will work
@@ -144,7 +145,7 @@ class wp_less {
 		try {
 
 			// initialise the parser
-			$less = new lessc;
+			$less = new lessc();
 
 			// load the cache
 			$cache_path = "{$css_path}.cache";
@@ -190,7 +191,8 @@ class wp_less {
 			} else {
 				$force = false;
 			}
-			$less_cache = $less->cachedCompile( $cache[ 'less' ], apply_filters( 'less_force_compile', $force ) );
+			$force = apply_filters( 'less_force_compile', $force );
+			$less_cache = $less->cachedCompile( $cache[ 'less' ], $force );
 
 			if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) || $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] || $this->vars !== $cache[ 'vars' ] ) {
 				file_put_contents( $cache_path, serialize( array( 'vars' => $this->vars, 'less' => $less_cache ) ) );
