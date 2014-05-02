@@ -214,7 +214,7 @@ if ( !class_exists( 'wp_less' ) ) {
 					} else {
 						$payload .= '<em><strong>Unknown! Contact the developers poste haste!!!!!!!</em><strong></em>';
 					}
-					$payload .= '<br>src: <code>"'.$src.'"</code> css path: <code>"'.$css_path.'"</code> and cache path: <code>"'.$cache_path.'" and scheme <code>"'.$src_scheme.'"</code>';
+					$payload .= '<br>src: <code>"'.$src.'"</code> css path: <code>"'.$css_path.'"</code> and cache path: <code>"'.$cache_path.'"</code> and scheme <code>"'.$src_scheme.'"</code>';
 					$this->add_message( array(
 						'time' => time(),
 						'payload' => $payload
