@@ -139,7 +139,7 @@ if ( !class_exists( 'wp_less' ) ) {
 			list( $less_path, $query_string ) = explode( '?', str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $src ) );
 
 			// output css file name
-			$css_path = trailingslashit( $this->get_cache_dir() ) . "{$handle}.css";
+			$css_path = trailingslashit( $this->get_cache_dir() ) . "{$src_scheme}-{$handle}.css";
 
 			// automatically regenerate files if source's modified time has changed or vars have changed
 			try {
@@ -197,10 +197,16 @@ if ( !class_exists( 'wp_less' ) ) {
 				$force = apply_filters( 'less_force_compile', $force );
 				$less_cache = $less->cachedCompile( $cache[ 'less' ], $force );
 
-				if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) || $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] || $this->vars !== $cache[ 'vars' ] ) {
+				// if they have the same values but differing order, they wont match
+				/*sort( $cache['less'] );
+				sort( $less_cache );*/
+
+				if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) || $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] || $this->vars != $cache[ 'vars' ] ) {
 					$payload = '<strong>Rebuilt stylesheet with handle: "'.$handle.'"</strong><br>';
-					if ( $this->vars !== $cache[ 'vars' ] ) {
+					if ( $this->vars != $cache[ 'vars' ] ) {
 						$payload .= '<em>Variables changed</em>';
+						$difference = array_merge(array_diff_assoc( $cache['vars'], $this->vars), array_diff_assoc($this->vars, $cache['vars'] ));
+						$payload .= '<pre>'.print_r( $difference, true ).'</pre>';
 					} else if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) ) {
 						$payload .= '<em>Empty cache or empty last update time</em>';
 					} else if ( $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] ) {
@@ -208,7 +214,7 @@ if ( !class_exists( 'wp_less' ) ) {
 					} else {
 						$payload .= '<em><strong>Unknown! Contact the developers poste haste!!!!!!!</em><strong></em>';
 					}
-					$payload .= '<br>src: <code>"'.$src.'"</code> css path: <code>"'.$css_path.'"</code> and cache path: <code>"'.$cache_path.'"</code>';
+					$payload .= '<br>src: <code>"'.$src.'"</code> css path: <code>"'.$css_path.'"</code> and cache path: <code>"'.$cache_path.'" and scheme <code>"'.$src_scheme.'"</code>';
 					$this->add_message( array(
 						'time' => time(),
 						'payload' => $payload
@@ -225,7 +231,7 @@ if ( !class_exists( 'wp_less' ) ) {
 			}
 
 			// restore query string it had if any
-			$url = trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css" . ( ! empty( $query_string ) ? "?{$query_string}" : '' );
+			$url = trailingslashit( $this->get_cache_dir( false ) ) . "{$src_scheme}-{$handle}.css" . ( ! empty( $query_string ) ? "?{$query_string}" : '' );
 
 			// restore original url scheme
 			$url = set_url_scheme( $url, $src_scheme );
