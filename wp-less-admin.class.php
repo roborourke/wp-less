@@ -36,9 +36,11 @@ class wp_less_admin {
 		<div class="wrap">
 			<h2>WP-LESS</h2>
 
-			<table>
+			<p>Here are messages from attempts to build/rebuild stylesheets. Only the last 20 messages are kept.</p>
+
+			<table class="wp-list-table widefat fixed">
 				<thead>
-					<th>Time</th>
+					<th width="120px">Time</th>
 					<th>Message</th>
 				</thead>
 				<tbody>
