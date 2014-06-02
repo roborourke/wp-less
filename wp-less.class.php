@@ -146,7 +146,8 @@ if ( !class_exists( 'wp_less' ) ) {
 
 				// initialise the parser
 				if ( !class_exists( 'lessc' ) ) {
-					wp_die( 'the lessphp library is missing, aborting, run composer update' );
+					return $url;
+					//wp_die( 'the lessphp library is missing, aborting, run composer update' );
 				}
 				$less = new lessc();
 
