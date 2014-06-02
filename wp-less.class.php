@@ -148,7 +148,7 @@ if ( !class_exists( 'wp_less' ) ) {
 				if ( !class_exists( 'lessc' ) ) {
 					wp_die( 'the lessphp library is missing, aborting, run composer update' );
 				}
-				$less = new lessc();
+
 
 				// load the cache
 				$cache_path = "{$css_path}.cache";
@@ -166,6 +166,7 @@ if ( !class_exists( 'wp_less' ) ) {
 					$cache = array( 'vars' => $this->vars, 'less' => $less_path );
 
 				// less config
+				$less = new lessc();
 				$less->setFormatter( apply_filters( 'less_compression', $this->compression ) );
 				$less->setPreserveComments( apply_filters( 'less_preserve_comments', $this->preserve_comments ) );
 				$less->setVariables( $this->vars );
@@ -198,8 +199,8 @@ if ( !class_exists( 'wp_less' ) ) {
 				$less_cache = $less->cachedCompile( $cache[ 'less' ], $force );
 
 				// if they have the same values but differing order, they wont match
-				/*sort( $cache['less'] );
-				sort( $less_cache );*/
+				//sort( $cache['less'] );
+				//sort( $less_cache );
 
 				if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) || $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] || $this->vars != $cache[ 'vars' ] ) {
 					$payload = '<strong>Rebuilt stylesheet with handle: "'.$handle.'"</strong><br>';
