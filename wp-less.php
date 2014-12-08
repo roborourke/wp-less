@@ -167,10 +167,7 @@ class wp_less {
 			$less = new lessc;
 
 			// load the cache
-			$cache_path = "{$css_path}.cache";
-
-			if ( file_exists( $cache_path ) )
-				$cache = unserialize( file_get_contents( $cache_path ) );
+			$cache = $this->get_cached_file_data( $handle );
 
 			// vars to pass into the compiler - default @themeurl var for image urls etc...
 			$this->vars[ 'themeurl' ] = '~"' . get_stylesheet_directory_uri() . '"';
@@ -213,8 +210,8 @@ class wp_less {
 			$less_cache = $less->cachedCompile( $cache[ 'less' ], apply_filters( 'less_force_compile', $force ) );
 
 			if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) || $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] || $this->vars !== $cache[ 'vars' ] ) {
-				file_put_contents( $cache_path, serialize( array( 'vars' => $this->vars, 'less' => $less_cache ) ) );
-				file_put_contents( $css_path, $less_cache[ 'compiled' ] );
+				$this->save_parsed_css( $css_path, $less_cache[ 'compiled' ] );
+				$this->update_cached_file_data( $handle, array( 'vars' => $this->vars, 'less' => $less_cache ) );
 			}
 		} catch ( exception $ex ) {
 			wp_die( $ex->getMessage() );
@@ -229,6 +226,45 @@ class wp_less {
 		return add_query_arg( 'ver', $less_cache[ 'updated' ], $url );
 	}
 
+	/**
+	 * Update parsed cache data for this file
+	 *
+	 * @param $path
+	 * @return bool
+	 */
+	public function get_cached_file_data( $path ) {
+		$caches = get_option( 'wp_less_cached_files', array() );
+
+		if ( isset( $caches[$path] ) ) {
+			return $caches[$path];
+		}
+
+		return null;
+	}
+
+	public function save_parsed_css( $css_path, $file_contents ) {
+		if ( ! apply_filters( 'less_save_css', $css_path, $file_contents ) ) {
+			return;
+		}
+
+		file_put_contents( $css_path, $file_contents );
+	}
+
+	/**
+	 * Update parsed cache data for this file
+	 *
+	 * @param $path
+	 * @param $file_data
+	 */
+	public function update_cached_file_data( $path, $file_data ) {
+		$file_data['less']['compiled'] = '';
+
+		$caches = get_option( 'wp_less_cached_files', array() );
+
+		$caches[$path] = $file_data;
+
+		update_option( 'wp_less_cached_files', $caches );
+	}
 
 	/**
 	 * Compile editor stylesheets registered via add_editor_style()
