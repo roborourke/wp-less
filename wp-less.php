@@ -157,9 +157,6 @@ class wp_less {
 
 		list( $less_path, $query_string ) = explode( '?', str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $src ) );
 
-		// output css file name
-		$css_path = trailingslashit( $this->get_cache_dir() ) . "{$handle}.css";
-
 		// automatically regenerate files if source's modified time has changed or vars have changed
 		try {
 
@@ -177,6 +174,9 @@ class wp_less {
 			// If the cache or root path in it are invalid then regenerate
 			if ( empty( $cache ) || empty( $cache['less']['root'] ) || ! file_exists( $cache['less']['root'] ) )
 				$cache = array( 'vars' => $this->vars, 'less' => $less_path );
+
+			if ( empty( $cache['url'] ) )
+				$cache['url'] = trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css";
 
 			// less config
 			$less->setFormatter( apply_filters( 'less_compression', $this->compression ) );
@@ -210,15 +210,24 @@ class wp_less {
 			$less_cache = $less->cachedCompile( $cache[ 'less' ], apply_filters( 'less_force_compile', $force ) );
 
 			if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) || $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] || $this->vars !== $cache[ 'vars' ] ) {
+				// output css file name
+				$css_path = trailingslashit( $this->get_cache_dir() ) . "{$handle}.css";
+
+				$cache = array(
+					'vars' => $this->vars,
+					'less' => $less_cache,
+					'url' => trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css",
+				);
+
 				$this->save_parsed_css( $css_path, $less_cache[ 'compiled' ] );
-				$this->update_cached_file_data( $handle, array( 'vars' => $this->vars, 'less' => $less_cache ) );
+				$this->update_cached_file_data( $handle, $cache );
 			}
 		} catch ( exception $ex ) {
 			wp_die( $ex->getMessage() );
 		}
 
 		// restore query string it had if any
-		$url = trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css" . ( ! empty( $query_string ) ? "?{$query_string}" : '' );
+		$url = $cache['url'] . ( ! empty( $query_string ) ? "?{$query_string}" : '' );
 
 		// restore original url scheme
 		$url = set_url_scheme( $url, $src_scheme );
@@ -321,8 +330,6 @@ class wp_less {
 
 		if ( $path ) {
 			$dir = apply_filters( 'wp_less_cache_path', path_join( $upload_dir[ 'basedir' ], 'wp-less-cache' ) );
-			// create folder if it doesn't exist yet
-			wp_mkdir_p( $dir );
 		} else {
 			$dir = apply_filters( 'wp_less_cache_url', path_join( $upload_dir[ 'baseurl' ], 'wp-less-cache' ) );
 		}
