@@ -120,13 +120,39 @@ class wp_less {
 	 */
 	public function http_request_args( $r, $url ) {
 
-		if ( 0 !== strpos( $url, 'http://api.wordpress.org/plugins/update-check' ) )
+		if ( ! preg_match( '#://api\.wordpress\.org/plugins/update-check/(?P<version>[0-9.]+)/#', $url, $matches ) )
 			return $r; // Not a plugin update request. Bail immediately.
 
-		$plugins = unserialize( $r[ 'body' ][ 'plugins' ] );
+		switch ( $matches['version'] ) {
+
+			case '1.0':
+				$plugins = unserialize( $r[ 'body' ][ 'plugins' ] );
+				break;
+
+			case '1.1':
+				$plugins = json_decode( $r[ 'body' ][ 'plugins' ] );
+				break;
+
+			default:
+				return $r;
+				break;
+
+		}
+
 		unset( $plugins->plugins[plugin_basename( __FILE__ )] );
 		unset( $plugins->active[ array_search( plugin_basename( __FILE__ ), $plugins->active ) ] );
-		$r[ 'body' ][ 'plugins' ] = serialize( $plugins );
+
+		switch ( $matches['version'] ) {
+
+			case '1.0':
+				$r[ 'body' ][ 'plugins' ] = serialize( $plugins );
+				break;
+
+			case '1.1':
+				$r[ 'body' ][ 'plugins' ] = json_encode( $plugins );
+				break;
+
+		}
 
 		return $r;
 	}
