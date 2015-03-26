@@ -14,12 +14,12 @@
 ! defined( 'ABSPATH' ) AND exit;
 
 // load the autoloader if it's present
-if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
-	require __DIR__ . '/vendor/autoload.php';
+if ( file_exists( dirname(__FILE__) . '/vendor/autoload.php' ) ) {
+	require dirname(__FILE__) . '/vendor/autoload.php';
 } else {
-	if ( file_exists( __DIR__ . '/vendor/leafo/lessphp/lessc.inc.php' ) ) {
+	if ( file_exists( dirname(__FILE__) . '/vendor/leafo/lessphp/lessc.inc.php' ) ) {
 		// load LESS parser
-		require_once( __DIR__ . '/vendor/leafo/lessphp/lessc.inc.php' );
+		require_once( dirname(__FILE__) . '/vendor/leafo/lessphp/lessc.inc.php' );
 	}
 }
 
