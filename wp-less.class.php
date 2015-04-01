@@ -229,7 +229,7 @@ if ( !class_exists( 'wp_less' ) ) {
 					'time' => time(),
 					'payload' => '<strong>Lessphp failure</strong> '.$ex->GetMessage()
 				) );
-				wp_die( $ex->getMessage() );
+				wp_die( wp_kses( $ex->getMessage() ) );
 			}
 
 			// restore query string it had if any
