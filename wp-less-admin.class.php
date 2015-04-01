@@ -50,10 +50,10 @@ class wp_less_admin {
 					foreach ( $recent_messages as $message ) {
 						echo '<tr>';
 						if ( is_array( $message ) ) {
-							echo '<td>'.date( 'D, d M Y H:i:s', $message['time'] ).'</td>';
-							echo '<td>'.$message['payload'].'</td>';
+							echo '<td>'.date( 'D, d M Y H:i:s', absint( $message['time'] ) ).'</td>';
+							echo '<td>'.wp_kses( $message['payload'] ).'</td>';
 						} else {
-							echo '<td colspan="2">'.$message.'</td>';
+							echo '<td colspan="2">'.wp_kses( $message ).'</td>';
 						}
 						echo '</tr>';
 					}
