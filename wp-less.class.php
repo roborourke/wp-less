@@ -138,6 +138,34 @@ if ( !class_exists( 'wp_less' ) ) {
 
 			list( $less_path, $query_string ) = explode( '?', str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $src ) );
 
+			$cache = $this->get_cached_file_data( $handle );
+			// vars to pass into the compiler - default @themeurl var for image urls etc...
+			$this->vars['themeurl'] = '~"' . get_stylesheet_directory_uri() . '"';
+			$this->vars['lessurl']  = '~"' . dirname( $src ) . '"';
+			$this->vars             = apply_filters( 'less_vars', $this->vars, $handle );
+
+			// The overall "version" of the LESS file is all it's vars, src etc.
+			$less_version           = md5( serialize( array( $this->vars, $src ) ) );
+
+			/**
+			 * Give the ability to disable always compiling the LESS with lessc()
+			 * and instead just use the $vars and $version of the LESS file to
+			 * dictate whether the LESS should be (re)generated.
+			 *
+			 * This means we don't need to run everything through the lessc() compiler
+			 * on every page load. The tradeoff is making a change in a LESS file will not
+			 * necessarily cause a (re)generation, one would need to bump the $ver param
+			 * on wp_enqueue_script() to cause that.
+			 */
+			if ( ! get_option( 'wp_less_always_compile_less', true ) ) {
+				if ( ( ! empty( $cache['version'] ) ) && $cache['version'] === $less_version ) {
+					// restore query string it had if any
+					$url = $cache['url'] . ( ! empty( $query_string ) ? "?{$query_string}" : '' );
+					$url = set_url_scheme( $url, $src_scheme );
+					return add_query_arg( 'ver', $less_version, $url );
+				}
+			}
+
 			// automatically regenerate files if source's modified time has changed or vars have changed
 			try {
 
@@ -146,15 +174,6 @@ if ( !class_exists( 'wp_less' ) ) {
 					return $url;
 					//wp_die( 'the lessphp library is missing, aborting, run composer update' );
 				}
-
-
-				// load the cache
-				$cache = $this->get_cached_file_data( $handle );
-
-				// vars to pass into the compiler - default @themeurl var for image urls etc...
-				$this->vars[ 'themeurl' ] = '~"' . get_stylesheet_directory_uri() . '"';
-				$this->vars[ 'lessurl' ]  = '~"' . dirname( $src ) . '"';
-				$this->vars = apply_filters( 'less_vars', $this->vars, $handle );
 
 				// If the cache or root path in it are invalid then regenerate
 				if ( empty( $cache ) || empty( $cache['less']['root'] ) || ! file_exists( $cache['less']['root'] ) )
@@ -206,10 +225,24 @@ if ( !class_exists( 'wp_less' ) ) {
 					$css_path = trailingslashit( $this->get_cache_dir() ) . "{$handle}.css";
 
 					$cache = array(
-						'vars' => $this->vars,
-						'less' => $less_cache,
-						'url' => trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css",
+						'vars'    => $this->vars,
+						'url'     => trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css",
+						'version' => $less_version,
+						'less'    => null
 					);
+					
+					/**
+					 * If the option to not have LESS always compiled is set,
+					 * then we dont store the whole less_cache in the options table as it's
+					 * not needed because we only do a comparison based off $vars and $src
+					 * (which includes the $ver param).
+					 *
+					 * This saves space on the options table for high performance environments.
+					 */
+					if ( get_option( 'wp_less_always_compile_less', true ) ) {
+						$cache['less'] = $less_cache;
+					}
+
 					$payload = '<strong>Rebuilt stylesheet with handle: "'.$handle.'"</strong><br>';
 					if ( $this->vars != $cache[ 'vars' ] ) {
 						$payload .= '<em>Variables changed</em>';
@@ -245,6 +278,11 @@ if ( !class_exists( 'wp_less' ) ) {
 			$url = set_url_scheme( $url, $src_scheme );
 
 			return add_query_arg( 'ver', $less_cache[ 'updated' ], $url );
+			if ( get_option( 'wp_less_always_compile_less', true ) ) {
+				return add_query_arg( 'ver', $less_cache['updated'], $url );
+			} else {
+				return add_query_arg( 'ver', $less_version, $url );
+			}
 		}
 		
 		/**
