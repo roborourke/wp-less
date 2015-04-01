@@ -152,10 +152,7 @@ if ( !class_exists( 'wp_less' ) ) {
 
 
 				// load the cache
-				$cache_path = "{$css_path}.cache";
-
-				if ( file_exists( $cache_path ) )
-					$cache = unserialize( file_get_contents( $cache_path ) );
+				$cache = $this->get_cached_file_data( $handle );
 
 				// vars to pass into the compiler - default @themeurl var for image urls etc...
 				$this->vars[ 'themeurl' ] = '~"' . get_stylesheet_directory_uri() . '"';
@@ -221,8 +218,8 @@ if ( !class_exists( 'wp_less' ) ) {
 						'time' => time(),
 						'payload' => $payload
 					) );
-					file_put_contents( $cache_path, serialize( array( 'vars' => $this->vars, 'less' => $less_cache ) ) );
-					file_put_contents( $css_path, $less_cache[ 'compiled' ] );
+					$this->save_parsed_css( $css_path, $less_cache[ 'compiled' ] );
+					$this->update_cached_file_data( $handle, array( 'vars' => $this->vars, 'less' => $less_cache ) );
 				}
 			} catch ( exception $ex ) {
 				$this->add_message( array(
@@ -240,12 +237,52 @@ if ( !class_exists( 'wp_less' ) ) {
 
 			return add_query_arg( 'ver', $less_cache[ 'updated' ], $url );
 		}
+		
+		/**
+		* Update parsed cache data for this file
+		*
+		* 
+		* @param $path
+		* @return bool
+		*/
+		public function get_cached_file_data( $path ) {
+			$caches = get_option( 'wp_less_cached_files', array() );
+	
+			if ( isset( $caches[$path] ) ) {
+				return $caches[$path];
+			}
+	
+			return null;
+		}
+	
+		public function save_parsed_css( $css_path, $file_contents ) {
+			if ( ! apply_filters( 'less_save_css', $css_path, $file_contents ) ) {
+				return;
+			}
+	
+			file_put_contents( $css_path, $file_contents );
+		}
 
+		/**
+		 * Update parsed cache data for this file
+		 *
+		 * @param $path
+		 * @param $file_data
+		 */
+		public function update_cached_file_data( $path, $file_data ) {
+			$file_data['less']['compiled'] = '';
+	
+			$caches = get_option( 'wp_less_cached_files', array() );
+	
+			$caches[$path] = $file_data;
+	
+			update_option( 'wp_less_cached_files', $caches );
+		}
 
 		/**
 		 * Compile editor stylesheets registered via add_editor_style()
 		 *
-		 * @param  string $mce_css Comma separated list of CSS file URLs
+		 * @param  string $mce_css Comma sepwparated list of CSS file URLs
 		 * @return string $mce_css New comma separated list of CSS file URLs
 		 */
 		public function parse_editor_stylesheets( $mce_css ) {
@@ -297,8 +334,6 @@ if ( !class_exists( 'wp_less' ) ) {
 
 			if ( $path ) {
 				$dir = apply_filters( 'wp_less_cache_path', path_join( $upload_dir[ 'basedir' ], 'wp-less-cache' ) );
-				// create folder if it doesn't exist yet
-				wp_mkdir_p( $dir );
 			} else {
 				$dir = apply_filters( 'wp_less_cache_url', path_join( $upload_dir[ 'baseurl' ], 'wp-less-cache' ) );
 			}
