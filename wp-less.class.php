@@ -138,9 +138,6 @@ if ( !class_exists( 'wp_less' ) ) {
 
 			list( $less_path, $query_string ) = explode( '?', str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $src ) );
 
-			// output css file name
-			$css_path = trailingslashit( $this->get_cache_dir() ) . "{$src_scheme}-{$handle}.css";
-
 			// automatically regenerate files if source's modified time has changed or vars have changed
 			try {
 
@@ -162,6 +159,10 @@ if ( !class_exists( 'wp_less' ) ) {
 				// If the cache or root path in it are invalid then regenerate
 				if ( empty( $cache ) || empty( $cache['less']['root'] ) || ! file_exists( $cache['less']['root'] ) )
 					$cache = array( 'vars' => $this->vars, 'less' => $less_path );
+
+				if ( empty( $cache['url'] ) ) {
+					$cache['url'] = trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css";
+				}
 
 				// less config
 				$less = new lessc();
@@ -200,7 +201,15 @@ if ( !class_exists( 'wp_less' ) ) {
 				//sort( $cache['less'] );
 				//sort( $less_cache );
 
-				if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) || $less_cache[ 'updated' ] > $cache[ 'less' ][ 'updated' ] || $this->vars != $cache[ 'vars' ] ) {
+				if ( empty( $cache ) || empty( $cache[ 'less' ][ 'updated' ] ) || md5( $less_cache['compiled'] ) !== md5( $cache['less']['compiled'] ) || $this->vars !== $cache['vars'] ) {
+					// output css file name
+					$css_path = trailingslashit( $this->get_cache_dir() ) . "{$handle}.css";
+
+					$cache = array(
+						'vars' => $this->vars,
+						'less' => $less_cache,
+						'url' => trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css",
+					);
 					$payload = '<strong>Rebuilt stylesheet with handle: "'.$handle.'"</strong><br>';
 					if ( $this->vars != $cache[ 'vars' ] ) {
 						$payload .= '<em>Variables changed</em>';
@@ -219,7 +228,7 @@ if ( !class_exists( 'wp_less' ) ) {
 						'payload' => $payload
 					) );
 					$this->save_parsed_css( $css_path, $less_cache[ 'compiled' ] );
-					$this->update_cached_file_data( $handle, array( 'vars' => $this->vars, 'less' => $less_cache ) );
+					$this->update_cached_file_data( $handle, $cache );
 				}
 			} catch ( exception $ex ) {
 				$this->add_message( array(
@@ -230,7 +239,7 @@ if ( !class_exists( 'wp_less' ) ) {
 			}
 
 			// restore query string it had if any
-			$url = trailingslashit( $this->get_cache_dir( false ) ) . "{$src_scheme}-{$handle}.css" . ( ! empty( $query_string ) ? "?{$query_string}" : '' );
+			$url = $cache['url'] . ( ! empty( $query_string ) ? "?{$query_string}" : '' );
 
 			// restore original url scheme
 			$url = set_url_scheme( $url, $src_scheme );
