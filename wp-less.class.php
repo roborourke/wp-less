@@ -303,12 +303,13 @@ if ( !class_exists( 'wp_less' ) ) {
 			// restore original url scheme
 			$url = set_url_scheme( $url, $src_scheme );
 
-			return add_query_arg( 'ver', $less_cache[ 'updated' ], $url );
+
 			if ( get_option( 'wp_less_always_compile_less', true ) ) {
 				return add_query_arg( 'ver', $less_cache['updated'], $url );
-			} else {
-				return add_query_arg( 'ver', $less_version, $url );
 			}
+
+			return add_query_arg( 'ver', $less_version, $url );
+
 		}
 		
 		/**
