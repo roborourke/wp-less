@@ -51,9 +51,9 @@ class wp_less_admin {
 						echo '<tr>';
 						if ( is_array( $message ) ) {
 							echo '<td>'.date( 'D, d M Y H:i:s', absint( $message['time'] ) ).'</td>';
-							echo '<td>'.wp_kses( $message['payload'] ).'</td>';
+							echo '<td>'.wp_strip_all_tags( $message['payload'] ).'</td>';
 						} else {
-							echo '<td colspan="2">'.wp_kses( $message ).'</td>';
+							echo '<td colspan="2">'.wp_strip_all_tags( $message ).'</td>';
 						}
 						echo '</tr>';
 					}

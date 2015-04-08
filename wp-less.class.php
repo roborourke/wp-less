@@ -294,7 +294,7 @@ if ( !class_exists( 'wp_less' ) ) {
 					'time' => time(),
 					'payload' => '<strong>Lessphp failure</strong> '.$ex->GetMessage()
 				) );
-				wp_die( wp_kses( $ex->getMessage() ) );
+				wp_die( wp_strip_all_tags( $ex->getMessage() ) );
 			}
 
 			// restore query string it had if any
