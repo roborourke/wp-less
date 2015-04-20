@@ -294,7 +294,7 @@ if ( !class_exists( 'wp_less' ) ) {
 					'time' => time(),
 					'payload' => '<strong>Lessphp failure</strong> '.$ex->GetMessage()
 				) );
-				wp_die( wp_kses( $ex->getMessage() ) );
+				wp_die( wp_strip_all_tags( $ex->getMessage() ) );
 			}
 
 			// restore query string it had if any
@@ -303,12 +303,13 @@ if ( !class_exists( 'wp_less' ) ) {
 			// restore original url scheme
 			$url = set_url_scheme( $url, $src_scheme );
 
-			return add_query_arg( 'ver', $less_cache[ 'updated' ], $url );
+
 			if ( get_option( 'wp_less_always_compile_less', true ) ) {
 				return add_query_arg( 'ver', $less_cache['updated'], $url );
-			} else {
-				return add_query_arg( 'ver', $less_version, $url );
 			}
+
+			return add_query_arg( 'ver', $less_version, $url );
+
 		}
 		
 		/**
@@ -407,6 +408,8 @@ if ( !class_exists( 'wp_less' ) ) {
 
 			if ( $path ) {
 				$dir = apply_filters( 'wp_less_cache_path', path_join( $upload_dir[ 'basedir' ], 'wp-less-cache' ) );
+				// create folder if it doesn't exist yet
+				wp_mkdir_p( $dir );
 			} else {
 				$dir = apply_filters( 'wp_less_cache_url', path_join( $upload_dir[ 'baseurl' ], 'wp-less-cache' ) );
 			}
