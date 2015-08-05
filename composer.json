@@ -16,6 +16,6 @@
     "require": {
         "php": ">=5.2.4",
         "composer/installers": "~1.0",
-        "oyejorge/less.php": "~1.7"
+        "oyejorge/less.php": "1.7.0.x"
     }
 }
