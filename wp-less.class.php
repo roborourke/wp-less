@@ -200,7 +200,7 @@ if ( !class_exists( 'wp_less' ) ) {
 
 				// initialise the parser
 				if ( !class_exists( 'lessc' ) ) {
-					$payload = 'Failed to do work, lessc library missing'
+					$payload = 'Failed to do work, lessc library missing';
 					$this->add_message( array(
 						'time' => time(),
 						'payload' => $payload
