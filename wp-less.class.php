@@ -148,19 +148,22 @@ if ( !class_exists( 'wp_less' ) ) {
 		 */
 		public function parse_stylesheet( $src, $handle ) {
 			// we only want to handle .less files
-			if ( ! preg_match( '/\.less(\.php)?$/', preg_replace( '/\?.*$/', '', $src ) ) )
+			if ( ! preg_match( '/\.less(\.php)?$/', preg_replace( '/\?.*$/', '', $src ) ) ) {
 				return $src;
+			}
 
 			// get file path from $src
-			if ( ! strstr( $src, '?' ) )
+			if ( ! strstr( $src, '?' ) ) {
 				$src .= '?'; // prevent non-existent index warning when using list() & explode()
+			}
 
 			// Match the URL schemes between WP_CONTENT_URL and $src,
 			// so the str_replace further down will work
 			$src_scheme = parse_url( $src, PHP_URL_SCHEME );
 			$wp_content_url_scheme = parse_url( WP_CONTENT_URL, PHP_URL_SCHEME );
-			if ( $src_scheme != $wp_content_url_scheme )
+			if ( $src_scheme != $wp_content_url_scheme ) {
 				$src = set_url_scheme( $src, $wp_content_url_scheme );
+			}
 
 			list( $less_path, $query_string ) = explode( '?', str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $src ) );
 
@@ -197,6 +200,11 @@ if ( !class_exists( 'wp_less' ) ) {
 
 				// initialise the parser
 				if ( !class_exists( 'lessc' ) ) {
+					$payload = 'Failed to do work, lessc library missing'
+					$this->add_message( array(
+						'time' => time(),
+						'payload' => $payload
+					) );
 					return $url;
 					//wp_die( 'the lessphp library is missing, aborting, run composer update' );
 				}
@@ -223,11 +231,13 @@ if ( !class_exists( 'wp_less' ) ) {
 				}
 
 				// register and unregister functions
-				foreach( $this->registered_functions as $name => $callable )
+				foreach( $this->registered_functions as $name => $callable ) {
 					$less->registerFunction( $name, $callable );
+				}
 
-				foreach( $this->unregistered_functions as $name )
+				foreach( $this->unregistered_functions as $name ) {
 					$less->unregisterFunction( $name );
+				}
 
 				// allow devs to mess around with the less object configuration
 				do_action_ref_array( 'lessc', array( &$less ) );
@@ -334,7 +344,14 @@ if ( !class_exists( 'wp_less' ) ) {
 				return;
 			}
 	
-			file_put_contents( $css_path, $file_contents );
+			if ( file_put_contents( $css_path, $file_contents ) == false ) {
+				$payload = 'Failed to write parsed css';
+				$payload .= '<br>css path: <code>"'.$css_path'"</code>';
+				$this->add_message( array(
+					'time' => time(),
+					'payload' => $payload
+				) );
+			}
 		}
 
 		/**
