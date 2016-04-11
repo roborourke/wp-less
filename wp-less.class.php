@@ -426,7 +426,12 @@ if ( !class_exists( 'wp_less' ) ) {
 			if ( $path ) {
 				$dir = apply_filters( 'wp_less_cache_path', path_join( $upload_dir[ 'basedir' ], 'wp-less-cache' ) );
 				// create folder if it doesn't exist yet
-				wp_mkdir_p( $dir );
+				if ( !wp_mkdir_p( $dir ) ) {
+					$this->add_message( array(
+						'time' => time(),
+						'payload' => 'Failed to create cache directory <code>"'.$dir.'"</code>',
+					) );
+				}
 			} else {
 				$dir = apply_filters( 'wp_less_cache_url', path_join( $upload_dir[ 'baseurl' ], 'wp-less-cache' ) );
 			}
@@ -494,7 +499,7 @@ if ( !class_exists( 'wp_less' ) ) {
 
 		public function add_message( $message_string ) {
 			$messages = get_option('wpless-recent-messages');
-			if ( !is_array( $messages ) ) {
+			if ( !is_array( $messages ) || empty( $messages ) ) {
 				$messages = array();
 			}
 
