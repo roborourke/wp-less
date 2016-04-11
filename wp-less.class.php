@@ -346,7 +346,7 @@ if ( !class_exists( 'wp_less' ) ) {
 	
 			if ( file_put_contents( $css_path, $file_contents ) == false ) {
 				$payload = 'Failed to write parsed css';
-				$payload .= '<br>css path: <code>"'.$css_path'"</code>';
+				$payload .= '<br>css path: <code>"'.$css_path.'"</code>';
 				$this->add_message( array(
 					'time' => time(),
 					'payload' => $payload
