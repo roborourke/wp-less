@@ -99,9 +99,11 @@ if ( !class_exists( 'wp_less' ) ) {
 			if ( ! preg_match( '#://api\.wordpress\.org/plugins/update-check/(?P<version>[0-9.]+)/#', $url, $matches ) )
 				return $r; // Not a plugin update request. Bail immediately.
 
-			if ( $r['response']['code'] != 200 ) {
-				// this is a failed request! We cant modify the results if the results timed out/failed
-				return $r;
+			if ( !empty( $r['response'] ) ) {
+				if ( $r['response']['code'] != 200 ) {
+					// this is a failed request! We can't modify the results if the results timed out/failed
+					return $r;
+				}
 			}
 
 			$plugins = unserialize( $r[ 'body' ][ 'plugins' ] );
