@@ -125,7 +125,7 @@ if ( !class_exists( 'wp_less' ) ) {
 			
 			$basename = plugin_basename( __FILE__ );
 			
-			unset( $plugins->plugins[ $basename ] );
+			//unset( $plugins->plugins[ $basename ] ); @TODO: Fix
 			unset( $plugins->active[ array_search( $basename, $plugins->active ) ] );
 			switch ( $matches['version'] ) {
 	
