@@ -123,8 +123,10 @@ if ( !class_exists( 'wp_less' ) ) {
 	
 			}
 			
-			unset( $plugins->plugins[plugin_basename( __FILE__ )] );
-			unset( $plugins->active[ array_search( plugin_basename( __FILE__ ), $plugins->active ) ] );
+			$basename = plugin_basename( __FILE__ );
+			
+			unset( $plugins->plugins[ $basename ] );
+			unset( $plugins->active[ array_search( $basename, $plugins->active ) ] );
 			switch ( $matches['version'] ) {
 	
 				case '1.0':
