@@ -94,12 +94,12 @@ if ( !class_exists( 'wp_less' ) ) {
 		 * @param  string $url
 		 * @return array
 		 */
-		public function http_request_args( $r, $url ) {
+		public function http_request_args( array $r, $url ) {
 
 			if ( ! preg_match( '#://api\.wordpress\.org/plugins/update-check/(?P<version>[0-9.]+)/#', $url, $matches ) )
 				return $r; // Not a plugin update request. Bail immediately.
 
-			if ( !isset( $r['response'] ) ) {
+			if ( isset( $r['response'] ) ) {
 				if ( $r['response']['code'] != 200 ) {
 					// this is a failed request! We can't modify the results if the results timed out/failed
 					return $r;
