@@ -106,38 +106,11 @@ if ( !class_exists( 'wp_less' ) ) {
 				}
 			}
 
-			$plugins = unserialize( $r[ 'body' ][ 'plugins' ] );
-			switch ( $matches['version'] ) {
-	
-				case '1.0':
-					$plugins = unserialize( $r[ 'body' ][ 'plugins' ] );
-					break;
-	
-				case '1.1':
-					$plugins = json_decode( $r[ 'body' ][ 'plugins' ] );
-					break;
-	
-				default:
-					return $r;
-					break;
-	
-			}
-			
+			$plugins = json_decode( $r[ 'body' ][ 'plugins' ] );
 			$basename = plugin_basename( __FILE__ );
-			
-			//unset( $plugins->plugins[ $basename ] ); @TODO: Fix
+			unset( $plugins->plugins->$basename );
 			unset( $plugins->active[ array_search( $basename, $plugins->active ) ] );
-			switch ( $matches['version'] ) {
-	
-				case '1.0':
-					$r[ 'body' ][ 'plugins' ] = serialize( $plugins );
-					break;
-	
-				case '1.1':
-					$r[ 'body' ][ 'plugins' ] = json_encode( $plugins );
-					break;
-	
-			}
+			$r[ 'body' ][ 'plugins' ] = json_encode( $plugins );
 
 			return $r;
 		}
