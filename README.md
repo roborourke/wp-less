@@ -13,7 +13,12 @@ before deploying them.
 
 If you are using git to clone the repository, do the following:
 
-    git clone git://github.com/sanchothefat/wp-less.git wp-less
+    git clone --recursive git://github.com/sanchothefat/wp-less.git wp-less
+
+Should you forget to add the recursive flag as above, then run the following git commands
+
+    git submodule init
+    git submodule update
 
 If you are downloading the `.zip` or `.tar`, don't forget to download the [lessphp
 dependency too](https://github.com/leafo/lessphp) and copy it into the `vendor/leafo/lessphp`
